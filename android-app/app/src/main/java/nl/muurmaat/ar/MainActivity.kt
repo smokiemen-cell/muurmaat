@@ -93,7 +93,6 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.request_reset_button).setOnClickListener { requestPasswordReset() }
         findViewById<Button>(R.id.request_username_button).setOnClickListener { requestUsername() }
         findViewById<Button>(R.id.back_to_login_button).setOnClickListener { showAccountScreen() }
-        findViewById<Button>(R.id.logout_button).setOnClickListener { logout() }
         findViewById<Button>(R.id.account_details_back).setOnClickListener { showStartPage() }
         findViewById<Button>(R.id.update_account_button).setOnClickListener { updateAccountDetails() }
         findViewById<CheckBox>(R.id.show_login_password).setOnCheckedChangeListener { _, checked -> togglePassword(R.id.login_password_input, checked) }
