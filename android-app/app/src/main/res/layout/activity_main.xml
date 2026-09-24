@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F0E8">
+    android:background="@drawable/stone_wall">
 
     <FrameLayout
         android:id="@+id/ar_container"
@@ -55,7 +55,8 @@
         android:layout_gravity="center"
         android:orientation="vertical"
         android:padding="20dp"
-        android:background="#FFFDF8">
+        android:layout_margin="18dp"
+        android:background="#E6FFFDF8">
 
         <TextView
             android:layout_width="match_parent"
@@ -65,6 +66,15 @@
             android:textSize="11sp"
             android:textStyle="bold"
             android:paddingBottom="8dp" />
+
+        <Button
+            android:id="@+id/menu_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:backgroundTint="#E8DFCF"
+            android:textColor="#173F3A"
+            android:text="Menu" />
 
         <TextView
             android:layout_width="match_parent"
@@ -117,17 +127,6 @@
                 android:textColor="#173F3A"
                 android:textColorHint="#847F73"
                 android:backgroundTint="#D5CDBF" />
-            <EditText
-                android:id="@+id/manual_price"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Prijs €"
-                android:inputType="numberDecimal"
-                android:text="8,50"
-                android:textColor="#173F3A"
-                android:textColorHint="#847F73"
-                android:backgroundTint="#D5CDBF" />
             <Button
                 android:id="@+id/manual_button"
                 android:layout_width="wrap_content"
@@ -136,6 +135,17 @@
                 android:textColor="#FFFDF8"
                 android:text="Invoer" />
         </LinearLayout>
+
+        <EditText
+            android:id="@+id/manual_price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Prijs per zak €"
+            android:inputType="numberDecimal"
+            android:text="21,95"
+            android:textColor="#173F3A"
+            android:textColorHint="#847F73"
+            android:backgroundTint="#D5CDBF" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -191,10 +201,94 @@
             android:id="@+id/result"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Oppervlakte: -   Zakken: -   Totaal: -"
+            android:text="Oppervlakte: -&#10;Zakken: -&#10;Prijs per zak: -&#10;Totaalprijs: -"
             android:textColor="#FFFDF8"
             android:textSize="18sp"
+            android:lineSpacingExtra="5dp"
             android:padding="16dp"
             android:background="#173F3A" />
+
+        <EditText
+            android:id="@+id/wall_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Naam van deze muur"
+            android:inputType="textCapSentences"
+            android:textColor="#173F3A"
+            android:textColorHint="#847F73"
+            android:backgroundTint="#D5CDBF" />
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#173F3A"
+            android:textColor="#FFFDF8"
+            android:text="Meting opslaan" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/menu_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="28dp"
+        android:background="#FFFDF8"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Menu"
+            android:textColor="#173F3A"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:paddingBottom="24dp" />
+        <Button
+            android:id="@+id/start_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#173F3A"
+            android:textColor="#FFFDF8"
+            android:text="Startpagina" />
+        <Button
+            android:id="@+id/saved_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#C96F4A"
+            android:textColor="#FFFDF8"
+            android:text="Opgeslagen metingen" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/saved_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="28dp"
+        android:background="#FFFDF8"
+        android:visibility="gone">
+        <Button
+            android:id="@+id/saved_back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#E8DFCF"
+            android:textColor="#173F3A"
+            android:text="Terug" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Opgeslagen metingen"
+            android:textColor="#173F3A"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:paddingTop="18dp"
+            android:paddingBottom="14dp" />
+        <TextView
+            android:id="@+id/saved_measurements"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#173F3A"
+            android:textSize="14sp" />
     </LinearLayout>
 </FrameLayout>

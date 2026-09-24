@@ -69,8 +69,8 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.saved_button).setOnClickListener { showSavedPage() }
         findViewById<Button>(R.id.saved_back_button).setOnClickListener { showStartPage() }
         findViewById<Button>(R.id.average_price_button).setOnClickListener {
-            findViewById<EditText>(R.id.manual_price).setText("8,50")
-            status.text = "Gemiddelde richtprijs ingevuld: € 8,50 per zak"
+            findViewById<EditText>(R.id.manual_price).setText("21,95")
+            status.text = "Richtprijs ingevuld: € 21,95 per zak"
         }
         findViewById<Button>(R.id.camera_button).setOnClickListener { button ->
             arContainer.visibility = View.VISIBLE
@@ -142,7 +142,7 @@ class MainActivity : AppCompatActivity() {
         mode = MeasureMode.LENGTH
         findViewById<EditText>(R.id.manual_length).text.clear()
         findViewById<EditText>(R.id.manual_height).text.clear()
-        findViewById<EditText>(R.id.manual_price).setText("8,50")
+        findViewById<EditText>(R.id.manual_price).setText("21,95")
         findViewById<EditText>(R.id.wall_name).text.clear()
         showStartPage()
         status.text = "Scan een vlak of vul lengte en hoogte handmatig in"
@@ -197,7 +197,7 @@ class MainActivity : AppCompatActivity() {
             status.text = "Vul een naam en geldige maten in voordat je opslaat"
             return
         }
-        val price = findViewById<EditText>(R.id.manual_price).text.toString().replace(',', '.').toFloatOrNull() ?: 8.5f
+        val price = findViewById<EditText>(R.id.manual_price).text.toString().replace(',', '.').toFloatOrNull() ?: 21.95f
         val bags = kotlin.math.ceil(length!! * height!! / 2.5f).toInt()
         val record = listOf(name.replace('|', '/'), "%.2f".format(length!!), "%.2f".format(height!!), bags, "%.2f".format(bags * price)).joinToString("|")
         val preferences = getSharedPreferences(savedPrefsName, MODE_PRIVATE)
