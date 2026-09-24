@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         arFragment = supportFragmentManager.findFragmentById(R.id.ar_fragment) as ArFragment
         status = findViewById(R.id.status)
         result = findViewById(R.id.result)
+        status.text = "Camera actief: tik een beginpunt voor de lengte aan"
 
         findViewById<Button>(R.id.length_button).setOnClickListener { selectMode(MeasureMode.LENGTH) }
         findViewById<Button>(R.id.height_button).setOnClickListener { selectMode(MeasureMode.HEIGHT) }
