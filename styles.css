@@ -89,7 +89,7 @@ input::placeholder { color: #c8c0b4; }
 .camera-heading h2 { margin: 0; }
 .close-button { border: 0; color: var(--ink); background: transparent; cursor: pointer; font-size: 31px; line-height: 20px; font-weight: 300; }
 .camera-view { position: relative; overflow: hidden; min-height: 270px; background: var(--ink-deep); }
-.camera-view video { display: block; width: 100%; min-height: 270px; object-fit: cover; transform: scaleX(-1); cursor: crosshair; }
+.camera-view video { display: block; width: 100%; min-height: 270px; object-fit: cover; cursor: crosshair; }
 .camera-crosshair { position: absolute; inset: 15% 12%; border: 1px dashed rgba(255,253,248,.72); pointer-events: none; }
 .camera-points { position: absolute; inset: 0; pointer-events: none; }
 .camera-point { position: absolute; width: 17px; height: 17px; border: 2px solid var(--white); border-radius: 50%; background: var(--clay); box-shadow: 0 0 0 3px rgba(23,63,58,.45); transform: translate(-50%, -50%); }
