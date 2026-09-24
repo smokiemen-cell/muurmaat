@@ -3,9 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment
-        android:id="@+id/ar_fragment"
-        android:name="com.google.ar.sceneform.ux.ArFragment"
+    <FrameLayout
+        android:id="@+id/ar_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone" />
@@ -24,6 +23,7 @@
         android:id="@+id/camera_screen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@android:color/transparent"
         android:visibility="gone">
 
         <Button
@@ -32,6 +32,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top|end"
             android:layout_margin="16dp"
+            android:backgroundTint="#C96F4A"
+            android:textColor="#FFFDF8"
             android:text="Sluiten" />
 
         <TextView
@@ -48,17 +50,27 @@
     <LinearLayout
         android:id="@+id/manual_panel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:padding="20dp"
-        android:background="#E6173F3A">
+        android:padding="28dp"
+        android:background="#FFF4F0E8">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="BOUWCALCULATOR"
+            android:textColor="#FFC96F4A"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Voegmaatje"
-            android:textColor="#FFFDF8"
+            android:textColor="#FF173F3A"
             android:textSize="28sp"
             android:textStyle="bold"
             android:paddingBottom="4dp" />
@@ -67,7 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Maten, aantallen en prijzen zijn indicaties en kunnen afwijken van de werkelijkheid."
-            android:textColor="#B1C0B6"
+            android:textColor="#FF5D655D"
             android:textSize="12sp"
             android:paddingBottom="12dp" />
 
@@ -76,7 +88,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Vul je muur in of kies camera"
-            android:textColor="#FFFDF8"
+            android:textColor="#FF173F3A"
             android:textSize="16sp"
             android:paddingBottom="12dp" />
 
@@ -91,8 +103,8 @@
                 android:layout_weight="1"
                 android:hint="Lengte m"
                 android:inputType="numberDecimal"
-                android:textColor="#FFFDF8"
-                android:textColorHint="#B1C0B6" />
+                android:textColor="#FF173F3A"
+                android:textColorHint="#FF847F73" />
             <EditText
                 android:id="@+id/manual_height"
                 android:layout_width="0dp"
@@ -100,8 +112,8 @@
                 android:layout_weight="1"
                 android:hint="Hoogte m"
                 android:inputType="numberDecimal"
-                android:textColor="#FFFDF8"
-                android:textColorHint="#B1C0B6" />
+                android:textColor="#FF173F3A"
+                android:textColorHint="#FF847F73" />
             <EditText
                 android:id="@+id/manual_price"
                 android:layout_width="0dp"
@@ -110,8 +122,8 @@
                 android:hint="Prijs €"
                 android:inputType="numberDecimal"
                 android:text="8,50"
-                android:textColor="#FFFDF8"
-                android:textColorHint="#B1C0B6" />
+                android:textColor="#FF173F3A"
+                android:textColorHint="#FF847F73" />
             <Button
                 android:id="@+id/manual_button"
                 android:layout_width="wrap_content"
@@ -128,11 +140,15 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:backgroundTint="#173F3A"
+                android:textColor="#FFFDF8"
                 android:text="Meet met camera" />
             <Button
                 android:id="@+id/average_price_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="#E8DFCF"
+                android:textColor="#173F3A"
                 android:text="Gem. prijs" />
         </LinearLayout>
 
@@ -145,17 +161,23 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:backgroundTint="#173F3A"
+                android:textColor="#FFFDF8"
                 android:text="Lengte" />
             <Button
                 android:id="@+id/height_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:backgroundTint="#173F3A"
+                android:textColor="#FFFDF8"
                 android:text="Hoogte" />
             <Button
                 android:id="@+id/reset_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="#E8DFCF"
+                android:textColor="#173F3A"
                 android:text="Reset" />
         </LinearLayout>
 
@@ -165,7 +187,9 @@
             android:layout_height="wrap_content"
             android:text="Oppervlakte: -   Zakken: -   Totaal: -"
             android:textColor="#FFFDF8"
-            android:textSize="18sp"
-            android:paddingTop="12dp" />
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:padding="16dp"
+            android:background="#173F3A" />
     </LinearLayout>
 </FrameLayout>
