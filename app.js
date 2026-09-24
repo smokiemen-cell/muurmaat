@@ -60,7 +60,7 @@ document.querySelector('#camera-button').addEventListener('click', async () => {
     return;
   }
   try {
-    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: 'environment' } }, audio: false });
     cameraVideo.srcObject = cameraStream;
     setCameraStatus('Tik de twee uiteinden van de referentie aan.');
   } catch (error) {
