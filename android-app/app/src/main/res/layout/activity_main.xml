@@ -152,7 +152,7 @@
             android:id="@+id/manual_price"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Prijs per zak €"
+            android:hint="Gemiddelde prijs per zak €"
             android:inputType="numberDecimal"
             android:importantForAutofill="no"
             android:text="21,95"
