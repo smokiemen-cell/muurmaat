@@ -16,6 +16,7 @@ import android.widget.Toast
 import java.security.MessageDigest
 import android.util.Patterns
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.math.Vector3
@@ -45,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var savedMeasurements: LinearLayout
     private val savedPrefsName = "voegmaatje_measurements"
     private val firebaseAuth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+    private val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private lateinit var result: TextView
     private var mode = MeasureMode.LENGTH
     private var firstPoint: Vector3? = null
@@ -294,22 +296,48 @@ class MainActivity : AppCompatActivity() {
             error.text = "Vul een geldig e-mailadres in"
             return
         }
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+        checkUsername(username) { available, suggestions ->
+            if (!available) {
+                error.text = "Gebruikersnaam bestaat al. Beschikbaar: ${suggestions.joinToString(", ")}" 
+                return@checkUsername
+            }
+            firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                firebaseAuth.currentUser?.sendEmailVerification()
-                getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit()
-                    .putString("username", username)
-                    .putString("email", email)
-                    .apply()
-                error.text = "Account gemaakt. Controleer je e-mail en log daarna in."
-            } else {
-                val message = task.exception?.message.orEmpty()
-                error.text = if (message.contains("already", ignoreCase = true) || message.contains("already in use", ignoreCase = true)) {
-                    "Dit e-mailadres bestaat al. Gebruik Inloggen."
+                    firebaseAuth.currentUser?.sendEmailVerification()
+                    firestore.collection("usernames").document(username.lowercase()).set(mapOf("username" to username, "uid" to firebaseAuth.currentUser?.uid))
+                    getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit()
+                        .putString("username", username)
+                        .putString("email", email)
+                        .apply()
+                    error.text = "Account gemaakt. Controleer je e-mail en log daarna in."
                 } else {
-                    task.exception?.localizedMessage ?: "Account maken is mislukt"
+                    val message = task.exception?.message.orEmpty()
+                    error.text = if (message.contains("already", ignoreCase = true)) "Dit e-mailadres bestaat al. Gebruik Inloggen." else task.exception?.localizedMessage ?: "Account maken is mislukt"
                 }
             }
+        }
+    }
+
+    private fun checkUsername(username: String, callback: (Boolean, List<String>) -> Unit) {
+        val base = username.lowercase()
+        firestore.collection("usernames").document(base).get().addOnSuccessListener { snapshot ->
+            if (!snapshot.exists()) {
+                callback(true, emptyList())
+            } else {
+                val candidates = listOf("${username}01", "${username}123", "${username}24", "${username}app")
+                checkCandidates(candidates, 0, mutableListOf(), callback)
+            }
+        }
+    }
+
+    private fun checkCandidates(candidates: List<String>, index: Int, available: MutableList<String>, callback: (Boolean, List<String>) -> Unit) {
+        if (index >= candidates.size) {
+            callback(false, available)
+            return
+        }
+        firestore.collection("usernames").document(candidates[index].lowercase()).get().addOnSuccessListener { snapshot ->
+            if (!snapshot.exists() && available.size < 3) available.add(candidates[index])
+            checkCandidates(candidates, index + 1, available, callback)
         }
     }
 
