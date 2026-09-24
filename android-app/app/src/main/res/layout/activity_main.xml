@@ -273,6 +273,13 @@
             android:textColor="#FFFDF8"
             android:text="Opgeslagen metingen" />
         <Button
+            android:id="@+id/account_details_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#E8DFCF"
+            android:textColor="#173F3A"
+            android:text="Accountgegevens" />
+        <Button
             android:id="@+id/logout_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -339,6 +346,7 @@
             android:paddingBottom="22dp" />
         <EditText android:id="@+id/login_username_input" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Gebruikersnaam" android:inputType="textCapSentences" android:textColor="#173F3A" android:textColorHint="#847F73" android:backgroundTint="#D5CDBF" />
         <EditText android:id="@+id/login_password_input" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Wachtwoord" android:inputType="textPassword" android:autofillHints="password" android:textColor="#173F3A" android:textColorHint="#847F73" android:backgroundTint="#D5CDBF" />
+        <CheckBox android:id="@+id/show_login_password" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Wachtwoord tonen" android:textColor="#173F3A" />
         <CheckBox android:id="@+id/remember_checkbox" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Ingelogd blijven (6 maanden)" android:textColor="#173F3A" />
         <TextView android:id="@+id/account_error" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#C96F4A" android:textSize="12sp" android:paddingTop="8dp" />
         <Button android:id="@+id/login_button" android:layout_width="match_parent" android:layout_height="wrap_content" android:backgroundTint="#173F3A" android:textColor="#FFFDF8" android:text="Inloggen" />
@@ -391,6 +399,7 @@
             android:textColor="#173F3A"
             android:textColorHint="#847F73"
             android:backgroundTint="#D5CDBF" />
+        <CheckBox android:id="@+id/show_account_password" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Wachtwoord tonen" android:textColor="#173F3A" />
         <EditText
             android:id="@+id/email_input"
             android:layout_width="match_parent"
@@ -402,7 +411,7 @@
             android:textColorHint="#847F73"
             android:backgroundTint="#D5CDBF" />
         <TextView
-            android:id="@+id/account_error"
+            android:id="@+id/create_account_error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="#C96F4A"
@@ -466,5 +475,23 @@
             android:backgroundTint="#E8DFCF"
             android:textColor="#173F3A"
             android:text="Terug naar inloggen" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/account_details_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="28dp"
+        android:background="#FFFDF8"
+        android:visibility="gone">
+        <Button android:id="@+id/account_details_back" android:layout_width="wrap_content" android:layout_height="wrap_content" android:backgroundTint="#E8DFCF" android:textColor="#173F3A" android:text="Terug" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Accountgegevens" android:textColor="#173F3A" android:textSize="28sp" android:textStyle="bold" android:paddingTop="18dp" />
+        <TextView android:id="@+id/account_details_current" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#847F73" android:textSize="14sp" android:paddingTop="10dp" android:paddingBottom="18dp" />
+        <EditText android:id="@+id/change_email_input" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Nieuw e-mailadres" android:inputType="textEmailAddress" android:textColor="#173F3A" android:textColorHint="#847F73" android:backgroundTint="#D5CDBF" />
+        <EditText android:id="@+id/change_password_input" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Nieuw wachtwoord" android:inputType="textPassword" android:textColor="#173F3A" android:textColorHint="#847F73" android:backgroundTint="#D5CDBF" />
+        <CheckBox android:id="@+id/show_change_password" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Wachtwoord tonen" android:textColor="#173F3A" />
+        <TextView android:id="@+id/account_details_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#C96F4A" android:textSize="12sp" android:paddingTop="8dp" />
+        <Button android:id="@+id/update_account_button" android:layout_width="match_parent" android:layout_height="wrap_content" android:backgroundTint="#C96F4A" android:textColor="#FFFDF8" android:text="Gegevens wijzigen" />
     </LinearLayout>
 </FrameLayout>

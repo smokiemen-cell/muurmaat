@@ -2,6 +2,8 @@ package nl.muurmaat.ar
 
 import android.os.Bundle
 import android.view.View
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
@@ -37,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var savedScreen: View
     private lateinit var accountScreen: View
     private lateinit var loginScreen: View
+    private lateinit var accountDetailsScreen: View
     private lateinit var forgotScreen: View
     private lateinit var welcomeText: TextView
     private lateinit var savedMeasurements: LinearLayout
@@ -59,6 +62,7 @@ class MainActivity : AppCompatActivity() {
         savedScreen = findViewById(R.id.saved_screen)
         accountScreen = findViewById(R.id.account_screen)
         loginScreen = findViewById(R.id.login_screen)
+        accountDetailsScreen = findViewById(R.id.account_details_screen)
         forgotScreen = findViewById(R.id.forgot_screen)
         status = findViewById(R.id.status)
         welcomeText = findViewById(R.id.welcome_text)
@@ -87,6 +91,12 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.request_reset_button).setOnClickListener { requestPasswordReset() }
         findViewById<Button>(R.id.back_to_login_button).setOnClickListener { showAccountScreen() }
         findViewById<Button>(R.id.logout_button).setOnClickListener { logout() }
+        findViewById<Button>(R.id.account_details_button).setOnClickListener { showAccountDetails() }
+        findViewById<Button>(R.id.account_details_back).setOnClickListener { showStartPage() }
+        findViewById<Button>(R.id.update_account_button).setOnClickListener { updateAccountDetails() }
+        findViewById<CheckBox>(R.id.show_login_password).setOnCheckedChangeListener { _, checked -> togglePassword(R.id.login_password_input, checked) }
+        findViewById<CheckBox>(R.id.show_account_password).setOnCheckedChangeListener { _, checked -> togglePassword(R.id.password_input, checked) }
+        findViewById<CheckBox>(R.id.show_change_password).setOnCheckedChangeListener { _, checked -> togglePassword(R.id.change_password_input, checked) }
         findViewById<Button>(R.id.average_price_button).setOnClickListener {
             findViewById<EditText>(R.id.manual_price).setText("21,95")
             status.text = "Richtprijs ingevuld: € 21,95 per zak"
@@ -204,6 +214,7 @@ class MainActivity : AppCompatActivity() {
         manualPanel.visibility = View.VISIBLE
         menuScreen.visibility = View.GONE
         savedScreen.visibility = View.GONE
+        accountDetailsScreen.visibility = View.GONE
     }
 
     private fun showSavedPage() {
@@ -211,13 +222,66 @@ class MainActivity : AppCompatActivity() {
         manualPanel.visibility = View.GONE
         menuScreen.visibility = View.GONE
         savedScreen.visibility = View.VISIBLE
+        accountDetailsScreen.visibility = View.GONE
+    }
+
+    private fun showAccountDetails() {
+        val user = firebaseAuth.currentUser ?: return
+        val username = getSharedPreferences("voegmaatje_account", MODE_PRIVATE).getString("username", "")
+        findViewById<TextView>(R.id.account_details_current).text = "Gebruikersnaam: $username\nE-mailadres: ${user.email.orEmpty()}"
+        manualPanel.visibility = View.GONE
+        menuScreen.visibility = View.GONE
+        savedScreen.visibility = View.GONE
+        accountDetailsScreen.visibility = View.VISIBLE
+    }
+
+    private fun updateAccountDetails() {
+        val user = firebaseAuth.currentUser ?: return
+        val email = findViewById<EditText>(R.id.change_email_input).text.toString().trim()
+        val password = findViewById<EditText>(R.id.change_password_input).text.toString()
+        val status = findViewById<TextView>(R.id.account_details_status)
+        if (email.isNotBlank() && !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            status.text = "Vul een geldig e-mailadres in"
+            return
+        }
+        if (password.isNotBlank() && password.length < 4) {
+            status.text = "Wachtwoord moet minimaal 4 tekens hebben"
+            return
+        }
+        val updatePassword = {
+            if (password.isBlank()) {
+                status.text = "Accountgegevens opgeslagen"
+            } else {
+                user.updatePassword(password).addOnCompleteListener { task ->
+                    status.text = if (task.isSuccessful) "Accountgegevens opgeslagen" else "Wachtwoord wijzigen mislukt: log opnieuw in"
+                }
+            }
+        }
+        if (email.isBlank() || email == user.email) {
+            updatePassword()
+        } else {
+            user.updateEmail(email).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit().putString("email", email).apply()
+                    updatePassword()
+                } else {
+                    status.text = "E-mailadres wijzigen mislukt: log opnieuw in"
+                }
+            }
+        }
+    }
+
+    private fun togglePassword(fieldId: Int, visible: Boolean) {
+        val field = findViewById<EditText>(fieldId)
+        field.transformationMethod = if (visible) HideReturnsTransformationMethod.getInstance() else PasswordTransformationMethod.getInstance()
+        field.setSelection(field.text.length)
     }
 
     private fun createAccount() {
         val username = findViewById<EditText>(R.id.username_input).text.toString().trim()
         val password = findViewById<EditText>(R.id.password_input).text.toString()
         val email = findViewById<EditText>(R.id.email_input).text.toString().trim()
-        val error = findViewById<TextView>(R.id.account_error)
+        val error = findViewById<TextView>(R.id.create_account_error)
         if (username.length < 2) {
             error.text = "Gebruikersnaam moet minimaal 2 tekens hebben"
             return
@@ -239,7 +303,12 @@ class MainActivity : AppCompatActivity() {
                     .apply()
                 error.text = "Account gemaakt. Controleer je e-mail en log daarna in."
             } else {
-                error.text = task.exception?.localizedMessage ?: "Account maken is mislukt"
+                val message = task.exception?.message.orEmpty()
+                error.text = if (message.contains("already", ignoreCase = true) || message.contains("already in use", ignoreCase = true)) {
+                    "Dit e-mailadres bestaat al. Gebruik Inloggen."
+                } else {
+                    task.exception?.localizedMessage ?: "Account maken is mislukt"
+                }
             }
         }
     }
