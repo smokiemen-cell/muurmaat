@@ -7,6 +7,7 @@ import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -30,7 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var manualPanel: View
     private lateinit var menuScreen: View
     private lateinit var savedScreen: View
-    private lateinit var savedMeasurements: TextView
+    private lateinit var savedMeasurements: LinearLayout
     private val savedPrefsName = "voegmaatje_measurements"
     private lateinit var result: TextView
     private var mode = MeasureMode.LENGTH
@@ -211,13 +212,37 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateSavedMeasurements() {
         val records = getSharedPreferences(savedPrefsName, MODE_PRIVATE).getStringSet("records", emptySet()).orEmpty()
-        savedMeasurements.text = if (records.isEmpty()) {
-            "Nog geen metingen opgeslagen"
-        } else {
-            records.mapNotNull { record ->
-                val parts = record.split('|')
-                if (parts.size == 5) "${parts[0]} - ${parts[1]} x ${parts[2]} m | ${parts[3]} zakken | € ${parts[4]}" else null
-            }.sorted().joinToString("\n")
+        savedMeasurements.removeAllViews()
+        if (records.isEmpty()) {
+            savedMeasurements.addView(TextView(this).apply {
+                text = "Nog geen metingen opgeslagen"
+                textSize = 14f
+                setTextColor(android.graphics.Color.rgb(23, 63, 58))
+            })
+            return
+        }
+        records.sorted().forEach { record ->
+            val parts = record.split('|')
+            if (parts.size != 5) return@forEach
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, 8, 0, 8)
+            }
+            row.addView(TextView(this).apply {
+                text = "${parts[0]} - ${parts[1]} x ${parts[2]} m | ${parts[3]} zakken | € ${parts[4]}"
+                textSize = 14f
+                setTextColor(android.graphics.Color.rgb(23, 63, 58))
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            })
+            row.addView(Button(this).apply {
+                text = "Verwijder"
+                setOnClickListener {
+                    val updated = records.toMutableSet().apply { remove(record) }
+                    getSharedPreferences(savedPrefsName, MODE_PRIVATE).edit().putStringSet("records", updated).apply()
+                    updateSavedMeasurements()
+                }
+            })
+            savedMeasurements.addView(row)
         }
     }
 
