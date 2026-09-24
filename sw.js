@@ -1,4 +1,4 @@
-const CACHE_NAME = 'muurmaat-v4';
+const CACHE_NAME = 'voegmaatje-v5';
 const APP_FILES = ['./', './index.html', './styles.css', './app.js', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', (event) => {

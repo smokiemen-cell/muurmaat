@@ -1,4 +1,4 @@
-# Muurmaat AR
+# Voegmaatje AR
 
 Native Android ARCore prototype for measuring a wall.
 

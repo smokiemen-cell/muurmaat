@@ -1,6 +1,6 @@
 {
-  "name": "Muurmaat Voegcalculator",
-  "short_name": "Muurmaat",
+  "name": "Voegmaatje Voegcalculator",
+  "short_name": "Voegmaatje",
   "description": "Meet je muur en bereken het aantal zakken voegmortel.",
   "start_url": "./",
   "display": "standalone",

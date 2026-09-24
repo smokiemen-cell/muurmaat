@@ -1,5 +1,5 @@
 <resources>
-    <style name="Theme.Muurmaat" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Voegmaatje" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:fontFamily">sans</item>
         <item name="android:colorAccent">#c96f4a</item>
         <item name="android:navigationBarColor">#102e2b</item>

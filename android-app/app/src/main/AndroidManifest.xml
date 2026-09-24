@@ -3,8 +3,8 @@
     <uses-feature android:name="android.hardware.camera.ar" android:required="true" />
 
     <application
-        android:theme="@style/Theme.Muurmaat"
-        android:label="Muurmaat AR"
+        android:theme="@style/Theme.Voegmaatje"
+        android:label="Voegmaatje AR"
         android:icon="@drawable/ic_launcher">
         <meta-data android:name="com.google.ar.core" android:value="required" />
         <activity
