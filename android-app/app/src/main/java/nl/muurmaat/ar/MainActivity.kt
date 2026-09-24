@@ -13,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import java.security.MessageDigest
 import android.util.Patterns
+import com.google.firebase.auth.FirebaseAuth
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.math.Vector3
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var welcomeText: TextView
     private lateinit var savedMeasurements: LinearLayout
     private val savedPrefsName = "voegmaatje_measurements"
+    private val firebaseAuth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private lateinit var result: TextView
     private var mode = MeasureMode.LENGTH
     private var firstPoint: Vector3? = null
@@ -100,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 
         val accountPreferences = getSharedPreferences("voegmaatje_account", MODE_PRIVATE)
         val rememberUntil = accountPreferences.getLong("remember_until", 0L)
-        if (accountPreferences.getBoolean("logged_in", false) && rememberUntil > System.currentTimeMillis()) {
+        if (firebaseAuth.currentUser?.isEmailVerified == true && accountPreferences.getBoolean("logged_in", false) && rememberUntil > System.currentTimeMillis()) {
             showMainForUser(accountPreferences.getString("username", "") ?: "")
         } else {
             showAccountScreen()
@@ -206,11 +208,6 @@ class MainActivity : AppCompatActivity() {
         val password = findViewById<EditText>(R.id.password_input).text.toString()
         val email = findViewById<EditText>(R.id.email_input).text.toString().trim()
         val error = findViewById<TextView>(R.id.account_error)
-        val preferences = getSharedPreferences("voegmaatje_account", MODE_PRIVATE)
-        if (!preferences.getString("username", null).isNullOrBlank() && !preferences.getString("password_hash", null).isNullOrBlank()) {
-            error.text = "Dit account bestaat al. Gebruik Inloggen."
-            return
-        }
         if (username.length < 2) {
             error.text = "Gebruikersnaam moet minimaal 2 tekens hebben"
             return
@@ -223,12 +220,18 @@ class MainActivity : AppCompatActivity() {
             error.text = "Vul een geldig e-mailadres in"
             return
         }
-        preferences.edit()
-            .putString("username", username)
-            .putString("password_hash", hashPassword(password))
-            .putString("email", email)
-            .apply()
-        showMainForUser(username)
+        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                firebaseAuth.currentUser?.sendEmailVerification()
+                getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit()
+                    .putString("username", username)
+                    .putString("email", email)
+                    .apply()
+                error.text = "Account gemaakt. Controleer je e-mail en log daarna in."
+            } else {
+                error.text = task.exception?.localizedMessage ?: "Account maken is mislukt"
+            }
+        }
     }
 
     private fun login() {
@@ -237,19 +240,19 @@ class MainActivity : AppCompatActivity() {
         val email = findViewById<EditText>(R.id.email_input).text.toString().trim()
         val remember = findViewById<CheckBox>(R.id.remember_checkbox).isChecked
         val error = findViewById<TextView>(R.id.account_error)
-        val preferences = getSharedPreferences("voegmaatje_account", MODE_PRIVATE)
-        val savedUsername = preferences.getString("username", null)
-        val savedPasswordHash = preferences.getString("password_hash", null)
-        val savedEmail = preferences.getString("email", null)
-        if (savedUsername.isNullOrBlank() || savedPasswordHash.isNullOrBlank()) {
-            error.text = "Maak eerst een account aan"
-        } else if (username != savedUsername || email != savedEmail || hashPassword(password) != savedPasswordHash) {
-            error.text = "Gebruikersnaam of wachtwoord is niet juist"
-        } else {
-            error.text = ""
-            val rememberUntil = if (remember) System.currentTimeMillis() + 180L * 24L * 60L * 60L * 1000L else 0L
-            preferences.edit().putLong("remember_until", rememberUntil).apply()
-            showMainForUser(savedUsername)
+        val savedUsername = getSharedPreferences("voegmaatje_account", MODE_PRIVATE).getString("username", username) ?: username
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                error.text = task.exception?.localizedMessage ?: "Inloggen is mislukt"
+            } else if (firebaseAuth.currentUser?.isEmailVerified != true) {
+                firebaseAuth.signOut()
+                error.text = "Bevestig eerst je e-mailadres via de ontvangen e-mail"
+            } else {
+                error.text = ""
+                val rememberUntil = if (remember) System.currentTimeMillis() + 180L * 24L * 60L * 60L * 1000L else 0L
+                getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit().putLong("remember_until", rememberUntil).apply()
+                showMainForUser(savedUsername)
+            }
         }
     }
 
@@ -280,17 +283,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestPasswordReset() {
         val email = findViewById<EditText>(R.id.forgot_email_input).text.toString().trim()
-        val savedEmail = getSharedPreferences("voegmaatje_account", MODE_PRIVATE).getString("email", null)
         val message = findViewById<TextView>(R.id.forgot_status)
-        message.text = if (Patterns.EMAIL_ADDRESS.matcher(email).matches() && email == savedEmail) {
-            "E-mailadres herkend. Een echte resetlink vereist nog een gekoppelde maildienst."
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            message.text = "Vul een geldig e-mailadres in."
         } else {
-            "Dit e-mailadres staat niet bij dit account."
+            firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+                message.text = if (task.isSuccessful) "Resetlink verzonden. Controleer je e-mail." else "Resetlink kon niet worden verzonden."
+            }
         }
     }
 
     private fun logout() {
         getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit().putBoolean("logged_in", false).putLong("remember_until", 0L).apply()
+        firebaseAuth.signOut()
         findViewById<EditText>(R.id.username_input).text.clear()
         findViewById<EditText>(R.id.password_input).text.clear()
         manualPanel.visibility = View.GONE

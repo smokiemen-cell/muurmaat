@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "509687163019",
+    "project_id": "voegmaatje",
+    "storage_bucket": "voegmaatje.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:509687163019:android:400bef97de3829224a8c8e",
+        "android_client_info": {
+          "package_name": "nl.muurmaat.ar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHz_bPKBntZ077jZ4EittfTcnCphvGvPU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
