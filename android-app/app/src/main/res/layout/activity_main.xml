@@ -273,13 +273,6 @@
             android:textColor="#FFFDF8"
             android:text="Opgeslagen metingen" />
         <Button
-            android:id="@+id/account_details_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#E8DFCF"
-            android:textColor="#173F3A"
-            android:text="Accountgegevens" />
-        <Button
             android:id="@+id/logout_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
