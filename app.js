@@ -8,6 +8,7 @@ const cameraModal = document.querySelector('#camera-modal');
 const cameraVideo = document.querySelector('#camera-video');
 const cameraStatus = document.querySelector('#camera-status');
 const cameraStep = document.querySelector('#camera-step');
+const cameraPointsLayer = document.querySelector('#camera-points');
 let cameraStream;
 let cameraPoints = [];
 let cameraMode = 'reference';
@@ -45,6 +46,7 @@ const setCameraStatus = (message) => { cameraStatus.textContent = message; };
 const resetCameraMeasurement = () => {
   cameraPoints = [];
   cameraMode = 'reference';
+  cameraPointsLayer.innerHTML = '';
   cameraStep.textContent = 'Tik referentie aan';
   setCameraStatus('Tik de twee uiteinden van de referentie aan.');
 };
@@ -53,16 +55,19 @@ document.querySelector('#camera-button').addEventListener('click', async () => {
   cameraModal.classList.add('is-open');
   cameraModal.setAttribute('aria-hidden', 'false');
   resetCameraMeasurement();
-  if (!navigator.mediaDevices?.getUserMedia) {
-    setCameraStatus('Deze browser ondersteunt geen cameratoegang.');
+  if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+    setCameraStatus('Camera werkt alleen via HTTPS of localhost. Open de online app op je telefoon.');
     return;
   }
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
     cameraVideo.srcObject = cameraStream;
     setCameraStatus('Tik de twee uiteinden van de referentie aan.');
-  } catch {
-    setCameraStatus('Geen toegang tot de camera. Geef cameratoegang en probeer opnieuw.');
+  } catch (error) {
+    const message = error.name === 'NotAllowedError'
+      ? 'Cameratoegang is geweigerd. Geef toestemming in je browserinstellingen.'
+      : 'Camera kon niet starten. Controleer of een andere app de camera gebruikt.';
+    setCameraStatus(message);
   }
 });
 
@@ -74,11 +79,17 @@ document.querySelector('#close-camera').addEventListener('click', () => {
 
 document.querySelector('#reset-camera').addEventListener('click', resetCameraMeasurement);
 
-cameraVideo.addEventListener('click', (event) => {
-  if (!cameraVideo.videoWidth) return;
+cameraVideo.addEventListener('pointerup', (event) => {
+  if (!cameraVideo.videoWidth || cameraMode === 'done') return;
   const bounds = cameraVideo.getBoundingClientRect();
   const point = { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
   cameraPoints.push(point);
+  const marker = document.createElement('span');
+  marker.className = 'camera-point';
+  marker.dataset.number = cameraPoints.length;
+  marker.style.left = `${(point.x / bounds.width) * 100}%`;
+  marker.style.top = `${(point.y / bounds.height) * 100}%`;
+  cameraPointsLayer.append(marker);
   if (cameraPoints.length === 2 && cameraMode === 'reference') {
     cameraMode = 'height';
     cameraStep.textContent = 'Tik muurhoogte aan';
@@ -90,7 +101,12 @@ cameraVideo.addEventListener('click', (event) => {
   } else if (cameraPoints.length === 6) {
     const distance = (first, second) => Math.hypot(second.x - first.x, second.y - first.y);
     const reference = Number(document.querySelector('#reference-length').value);
-    const scale = reference / distance(cameraPoints[0], cameraPoints[1]);
+    const referencePixels = distance(cameraPoints[0], cameraPoints[1]);
+    if (reference <= 0 || referencePixels < 5) {
+      setCameraStatus('De referentie is te klein. Meet opnieuw met twee punten verder uit elkaar.');
+      return;
+    }
+    const scale = reference / referencePixels;
     const height = distance(cameraPoints[2], cameraPoints[3]) * scale;
     const length = distance(cameraPoints[4], cameraPoints[5]) * scale;
     document.querySelector('#height').value = height.toFixed(2);

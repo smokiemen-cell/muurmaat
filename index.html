@@ -88,7 +88,7 @@
   <section class="camera-modal" id="camera-modal" aria-hidden="true" aria-label="Camera meetmodus">
     <div class="camera-card">
       <div class="camera-heading"><div><p class="eyebrow">Camera meetmodus</p><h2>Scan je muur</h2></div><button class="close-button" id="close-camera" type="button" aria-label="Sluit camera">×</button></div>
-      <div class="camera-view"><video id="camera-video" autoplay playsinline muted></video><div class="camera-crosshair" aria-hidden="true"></div><span class="camera-live">LIVE</span></div>
+      <div class="camera-view"><video id="camera-video" autoplay playsinline muted></video><div class="camera-crosshair" aria-hidden="true"></div><div class="camera-points" id="camera-points" aria-hidden="true"></div><span class="camera-live">LIVE</span></div>
       <p class="camera-instruction">Vul eerst de lengte van een zichtbare referentie in. Tik daarna de twee uiteinden van de referentie, vervolgens de twee uiteinden van de muur aan.</p>
       <label class="field reference-field"><span>Referentielengte</span><div class="input-wrap"><input id="reference-length" type="number" min="0.01" step="0.01" value="1" inputmode="decimal"><span>m</span></div></label>
       <div class="camera-actions"><button class="secondary-button" id="reset-camera" type="button">Opnieuw</button><button class="calculate-button" id="camera-measure" type="button"><span id="camera-step">Tik referentie aan</span><span class="arrow" aria-hidden="true">↗</span></button></div>

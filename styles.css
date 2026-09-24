@@ -89,8 +89,11 @@ input::placeholder { color: #c8c0b4; }
 .camera-heading h2 { margin: 0; }
 .close-button { border: 0; color: var(--ink); background: transparent; cursor: pointer; font-size: 31px; line-height: 20px; font-weight: 300; }
 .camera-view { position: relative; overflow: hidden; min-height: 270px; background: var(--ink-deep); }
-.camera-view video { display: block; width: 100%; min-height: 270px; object-fit: cover; transform: scaleX(-1); }
+.camera-view video { display: block; width: 100%; min-height: 270px; object-fit: cover; transform: scaleX(-1); cursor: crosshair; }
 .camera-crosshair { position: absolute; inset: 15% 12%; border: 1px dashed rgba(255,253,248,.72); pointer-events: none; }
+.camera-points { position: absolute; inset: 0; pointer-events: none; }
+.camera-point { position: absolute; width: 17px; height: 17px; border: 2px solid var(--white); border-radius: 50%; background: var(--clay); box-shadow: 0 0 0 3px rgba(23,63,58,.45); transform: translate(-50%, -50%); }
+.camera-point::after { content: attr(data-number); position: absolute; top: -18px; left: 50%; color: var(--white); font: 10px "DM Mono", monospace; transform: translateX(-50%); }
 .camera-live { position: absolute; top: 12px; left: 14px; padding: 4px 7px; color: var(--white); background: var(--clay); font: 10px "DM Mono", monospace; letter-spacing: .1em; }
 .camera-instruction, .camera-status { color: var(--muted); font-size: 12px; line-height: 1.55; }
 .camera-instruction { margin: 18px 0; }
