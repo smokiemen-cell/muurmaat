@@ -374,7 +374,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<EditText>(R.id.manual_price).text.clear()
         functions.getHttpsCallable("getAverageGroutPrice").call()
             .addOnSuccessListener { result ->
-                val data = result.data as? Map<*, *>
+                val data = result.getData() as? Map<*, *>
                 val price = (data?.get("averagePrice") as? Number)?.toDouble()
                 val samples = (data?.get("samples") as? Number)?.toInt() ?: 0
                 if (price == null) {
