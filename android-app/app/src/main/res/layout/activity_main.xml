@@ -10,6 +10,7 @@
         android:layout_height="match_parent" />
 
     <LinearLayout
+        android:id="@+id/manual_panel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -21,7 +22,7 @@
             android:id="@+id/status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Camera actief: tik een beginpunt voor de lengte aan"
+            android:text="Vul je muur in of kies camera"
             android:textColor="#FFFDF8"
             android:textSize="16sp"
             android:paddingBottom="12dp" />
@@ -48,11 +49,38 @@
                 android:inputType="numberDecimal"
                 android:textColor="#FFFDF8"
                 android:textColorHint="#B1C0B6" />
+            <EditText
+                android:id="@+id/manual_price"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Prijs €"
+                android:inputType="numberDecimal"
+                android:text="8,50"
+                android:textColor="#FFFDF8"
+                android:textColorHint="#B1C0B6" />
             <Button
                 android:id="@+id/manual_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Invoer" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/camera_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Meet met camera" />
+            <Button
+                android:id="@+id/average_price_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gem. prijs" />
         </LinearLayout>
 
         <LinearLayout
@@ -82,7 +110,7 @@
             android:id="@+id/result"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Lengte: -   Hoogte: -   Zakken: -"
+            android:text="Oppervlakte: -   Zakken: -   Totaal: -"
             android:textColor="#FFFDF8"
             android:textSize="18sp"
             android:paddingTop="12dp" />

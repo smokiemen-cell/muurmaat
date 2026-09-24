@@ -1,6 +1,7 @@
 package nl.muurmaat.ar
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -34,12 +35,22 @@ class MainActivity : AppCompatActivity() {
         arFragment = supportFragmentManager.findFragmentById(R.id.ar_fragment) as ArFragment
         status = findViewById(R.id.status)
         result = findViewById(R.id.result)
-        status.text = "Camera actief: tik een beginpunt voor de lengte aan"
+        val sceneView = arFragment.arSceneView
+        sceneView.visibility = View.GONE
+        status.text = "Vul je muur in of kies camera"
 
         findViewById<Button>(R.id.length_button).setOnClickListener { selectMode(MeasureMode.LENGTH) }
         findViewById<Button>(R.id.height_button).setOnClickListener { selectMode(MeasureMode.HEIGHT) }
         findViewById<Button>(R.id.reset_button).setOnClickListener { resetMeasurement() }
         findViewById<Button>(R.id.manual_button).setOnClickListener { readManualInput() }
+        findViewById<Button>(R.id.average_price_button).setOnClickListener {
+            findViewById<EditText>(R.id.manual_price).setText("8,50")
+            status.text = "Gemiddelde richtprijs ingevuld: € 8,50 per zak"
+        }
+        findViewById<Button>(R.id.camera_button).setOnClickListener {
+            sceneView.visibility = View.VISIBLE
+            status.text = "Camera actief: tik een beginpunt voor de lengte aan"
+        }
 
         arFragment.setOnTapArPlaneListener { hitResult, plane, _ -> onPlaneTap(hitResult, plane) }
     }
@@ -94,6 +105,8 @@ class MainActivity : AppCompatActivity() {
             arFragment.arSceneView.scene.removeChild(marker)
         }
         markerNodes.clear()
+        arFragment.arSceneView.visibility = View.GONE
+        findViewById<View>(R.id.manual_panel).visibility = View.VISIBLE
         firstPoint = null
         length = null
         height = null
@@ -119,7 +132,10 @@ class MainActivity : AppCompatActivity() {
         val lengthText = length?.let { "%.2f m".format(it) } ?: "-"
         val heightText = height?.let { "%.2f m".format(it) } ?: "-"
         val bagsText = if (length != null && height != null) "%.0f".format(kotlin.math.ceil(length!! * height!! / 2.5f)) else "-"
-        result.text = "Lengte: $lengthText   Hoogte: $heightText   Zakken: $bagsText"
+        val price = findViewById<EditText>(R.id.manual_price).text.toString().replace(',', '.').toFloatOrNull() ?: 8.5f
+        val total = if (bagsText != "-") "€ %.2f".format(bagsText.toFloat() * price) else "-"
+        val area = if (length != null && height != null) "%.2f m²".format(length!! * height!!) else "-"
+        result.text = "Oppervlakte: $area   Zakken: $bagsText   Totaal: $total"
     }
 
     private enum class MeasureMode(val label: String) { LENGTH("Lengte"), HEIGHT("Hoogte") }
