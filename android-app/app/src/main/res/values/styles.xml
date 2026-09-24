@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.Muurmaat" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#c96f4a</item>
+        <item name="android:navigationBarColor">#102e2b</item>
+        <item name="android:statusBarColor">#173f3a</item>
+    </style>
+</resources>
