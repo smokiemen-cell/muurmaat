@@ -31,6 +31,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var manualPanel: View
     private lateinit var menuScreen: View
     private lateinit var savedScreen: View
+    private lateinit var accountScreen: View
+    private lateinit var welcomeText: TextView
     private lateinit var savedMeasurements: LinearLayout
     private val savedPrefsName = "voegmaatje_measurements"
     private lateinit var result: TextView
@@ -48,10 +50,12 @@ class MainActivity : AppCompatActivity() {
         manualPanel = findViewById(R.id.manual_panel)
         menuScreen = findViewById(R.id.menu_screen)
         savedScreen = findViewById(R.id.saved_screen)
+        accountScreen = findViewById(R.id.account_screen)
         arFragment = ArFragment()
         supportFragmentManager.beginTransaction().add(R.id.ar_container, arFragment, "ar_fragment").commitNow()
         arFragment.planeDiscoveryController?.hide()
         status = findViewById(R.id.status)
+        welcomeText = findViewById(R.id.welcome_text)
         savedMeasurements = findViewById(R.id.saved_measurements)
         updateSavedMeasurements()
         cameraScreen = findViewById(R.id.camera_screen)
@@ -69,6 +73,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.start_button).setOnClickListener { showStartPage() }
         findViewById<Button>(R.id.saved_button).setOnClickListener { showSavedPage() }
         findViewById<Button>(R.id.saved_back_button).setOnClickListener { showStartPage() }
+        findViewById<Button>(R.id.create_account_button).setOnClickListener { createAccount() }
         findViewById<Button>(R.id.average_price_button).setOnClickListener {
             findViewById<EditText>(R.id.manual_price).setText("21,95")
             status.text = "Richtprijs ingevuld: € 21,95 per zak"
@@ -82,6 +87,14 @@ class MainActivity : AppCompatActivity() {
             handHint.startAnimation(handAnimation())
         }
         findViewById<Button>(R.id.close_camera_button).setOnClickListener { closeCameraScreen() }
+
+        val savedUsername = getSharedPreferences("voegmaatje_account", MODE_PRIVATE).getString("username", null)
+        if (savedUsername.isNullOrBlank()) {
+            manualPanel.visibility = View.GONE
+            accountScreen.visibility = View.VISIBLE
+        } else {
+            showMainForUser(savedUsername)
+        }
 
         arFragment.setOnTapArPlaneListener { hitResult, plane, _ -> onPlaneTap(hitResult, plane) }
     }
@@ -176,6 +189,19 @@ class MainActivity : AppCompatActivity() {
         manualPanel.visibility = View.GONE
         menuScreen.visibility = View.GONE
         savedScreen.visibility = View.VISIBLE
+    }
+
+    private fun createAccount() {
+        val username = findViewById<EditText>(R.id.username_input).text.toString().trim()
+        if (username.isBlank()) return
+        getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit().putString("username", username).apply()
+        showMainForUser(username)
+    }
+
+    private fun showMainForUser(username: String) {
+        welcomeText.text = "Welkom, $username"
+        accountScreen.visibility = View.GONE
+        showStartPage()
     }
 
     private fun readManualInput() {

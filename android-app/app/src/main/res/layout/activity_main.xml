@@ -77,6 +77,16 @@
             android:text="Menu" />
 
         <TextView
+            android:id="@+id/welcome_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Welkom"
+            android:textColor="#C96F4A"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:paddingBottom="4dp" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Voegmaatje"
@@ -289,5 +299,48 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/account_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="28dp"
+        android:background="#FFFDF8">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Voegmaatje"
+            android:textColor="#173F3A"
+            android:textSize="34sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Welkom. Maak eerst je account aan om verder te gaan."
+            android:textColor="#847F73"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:paddingTop="12dp"
+            android:paddingBottom="22dp" />
+        <EditText
+            android:id="@+id/username_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Gebruikersnaam"
+            android:inputType="textCapSentences"
+            android:textColor="#173F3A"
+            android:textColorHint="#847F73"
+            android:backgroundTint="#D5CDBF" />
+        <Button
+            android:id="@+id/create_account_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#C96F4A"
+            android:textColor="#FFFDF8"
+            android:text="Account maken" />
     </LinearLayout>
 </FrameLayout>
