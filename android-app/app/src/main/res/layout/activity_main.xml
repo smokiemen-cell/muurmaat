@@ -1,7 +1,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F4F0E8">
 
     <FrameLayout
         android:id="@+id/ar_container"
@@ -52,25 +53,24 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:padding="28dp"
-        android:background="#FFF4F0E8">
+        android:padding="20dp"
+        android:background="#FFFDF8">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="BOUWCALCULATOR"
-            android:textColor="#FFC96F4A"
+            android:textColor="#C96F4A"
             android:textSize="11sp"
             android:textStyle="bold"
-            android:letterSpacing="0.12" />
+            android:paddingBottom="8dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Voegmaatje"
-            android:textColor="#FF173F3A"
+            android:textColor="#173F3A"
             android:textSize="28sp"
             android:textStyle="bold"
             android:paddingBottom="4dp" />
@@ -79,7 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Maten, aantallen en prijzen zijn indicaties en kunnen afwijken van de werkelijkheid."
-            android:textColor="#FF5D655D"
+            android:textColor="#847F73"
             android:textSize="12sp"
             android:paddingBottom="12dp" />
 
@@ -88,8 +88,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Vul je muur in of kies camera"
-            android:textColor="#FF173F3A"
-            android:textSize="16sp"
+            android:textColor="#173F3A"
+            android:textSize="22sp"
+            android:textStyle="bold"
             android:paddingBottom="12dp" />
 
         <LinearLayout
@@ -103,8 +104,9 @@
                 android:layout_weight="1"
                 android:hint="Lengte m"
                 android:inputType="numberDecimal"
-                android:textColor="#FF173F3A"
-                android:textColorHint="#FF847F73" />
+                android:textColor="#173F3A"
+                android:textColorHint="#847F73"
+                android:backgroundTint="#D5CDBF" />
             <EditText
                 android:id="@+id/manual_height"
                 android:layout_width="0dp"
@@ -112,8 +114,9 @@
                 android:layout_weight="1"
                 android:hint="Hoogte m"
                 android:inputType="numberDecimal"
-                android:textColor="#FF173F3A"
-                android:textColorHint="#FF847F73" />
+                android:textColor="#173F3A"
+                android:textColorHint="#847F73"
+                android:backgroundTint="#D5CDBF" />
             <EditText
                 android:id="@+id/manual_price"
                 android:layout_width="0dp"
@@ -122,12 +125,15 @@
                 android:hint="Prijs €"
                 android:inputType="numberDecimal"
                 android:text="8,50"
-                android:textColor="#FF173F3A"
-                android:textColorHint="#FF847F73" />
+                android:textColor="#173F3A"
+                android:textColorHint="#847F73"
+                android:backgroundTint="#D5CDBF" />
             <Button
                 android:id="@+id/manual_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="#173F3A"
+                android:textColor="#FFFDF8"
                 android:text="Invoer" />
         </LinearLayout>
 
@@ -140,7 +146,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:backgroundTint="#173F3A"
+                android:backgroundTint="#C96F4A"
                 android:textColor="#FFFDF8"
                 android:text="Meet met camera" />
             <Button
@@ -161,7 +167,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:backgroundTint="#173F3A"
+                android:backgroundTint="#C96F4A"
                 android:textColor="#FFFDF8"
                 android:text="Lengte" />
             <Button
@@ -169,7 +175,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:backgroundTint="#173F3A"
+                android:backgroundTint="#C96F4A"
                 android:textColor="#FFFDF8"
                 android:text="Hoogte" />
             <Button
@@ -187,8 +193,7 @@
             android:layout_height="wrap_content"
             android:text="Oppervlakte: -   Zakken: -   Totaal: -"
             android:textColor="#FFFDF8"
-            android:textSize="16sp"
-            android:layout_marginTop="16dp"
+            android:textSize="18sp"
             android:padding="16dp"
             android:background="#173F3A" />
     </LinearLayout>
