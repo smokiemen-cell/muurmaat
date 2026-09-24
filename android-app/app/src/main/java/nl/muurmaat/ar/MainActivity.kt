@@ -6,11 +6,13 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import java.security.MessageDigest
+import android.util.Patterns
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.math.Vector3
@@ -33,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var menuScreen: View
     private lateinit var savedScreen: View
     private lateinit var accountScreen: View
+    private lateinit var forgotScreen: View
     private lateinit var welcomeText: TextView
     private lateinit var savedMeasurements: LinearLayout
     private val savedPrefsName = "voegmaatje_measurements"
@@ -52,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         menuScreen = findViewById(R.id.menu_screen)
         savedScreen = findViewById(R.id.saved_screen)
         accountScreen = findViewById(R.id.account_screen)
+        forgotScreen = findViewById(R.id.forgot_screen)
         arFragment = ArFragment()
         supportFragmentManager.beginTransaction().add(R.id.ar_container, arFragment, "ar_fragment").commitNow()
         arFragment.planeDiscoveryController?.hide()
@@ -76,6 +80,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.saved_back_button).setOnClickListener { showStartPage() }
         findViewById<Button>(R.id.create_account_button).setOnClickListener { createAccount() }
         findViewById<Button>(R.id.login_button).setOnClickListener { login() }
+        findViewById<Button>(R.id.forgot_password_button).setOnClickListener { showForgotPassword() }
+        findViewById<Button>(R.id.request_reset_button).setOnClickListener { requestPasswordReset() }
+        findViewById<Button>(R.id.back_to_login_button).setOnClickListener { showAccountScreen() }
         findViewById<Button>(R.id.logout_button).setOnClickListener { logout() }
         findViewById<Button>(R.id.average_price_button).setOnClickListener {
             findViewById<EditText>(R.id.manual_price).setText("21,95")
@@ -91,8 +98,13 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.close_camera_button).setOnClickListener { closeCameraScreen() }
 
-        manualPanel.visibility = View.GONE
-        accountScreen.visibility = View.VISIBLE
+        val accountPreferences = getSharedPreferences("voegmaatje_account", MODE_PRIVATE)
+        val rememberUntil = accountPreferences.getLong("remember_until", 0L)
+        if (accountPreferences.getBoolean("logged_in", false) && rememberUntil > System.currentTimeMillis()) {
+            showMainForUser(accountPreferences.getString("username", "") ?: "")
+        } else {
+            showAccountScreen()
+        }
 
         arFragment.setOnTapArPlaneListener { hitResult, plane, _ -> onPlaneTap(hitResult, plane) }
     }
@@ -192,9 +204,10 @@ class MainActivity : AppCompatActivity() {
     private fun createAccount() {
         val username = findViewById<EditText>(R.id.username_input).text.toString().trim()
         val password = findViewById<EditText>(R.id.password_input).text.toString()
+        val email = findViewById<EditText>(R.id.email_input).text.toString().trim()
         val error = findViewById<TextView>(R.id.account_error)
         val preferences = getSharedPreferences("voegmaatje_account", MODE_PRIVATE)
-        if (!preferences.getString("username", null).isNullOrBlank()) {
+        if (!preferences.getString("username", null).isNullOrBlank() && !preferences.getString("password_hash", null).isNullOrBlank()) {
             error.text = "Dit account bestaat al. Gebruik Inloggen."
             return
         }
@@ -206,9 +219,14 @@ class MainActivity : AppCompatActivity() {
             error.text = "Wachtwoord moet minimaal 4 tekens hebben"
             return
         }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            error.text = "Vul een geldig e-mailadres in"
+            return
+        }
         preferences.edit()
             .putString("username", username)
             .putString("password_hash", hashPassword(password))
+            .putString("email", email)
             .apply()
         showMainForUser(username)
     }
@@ -216,16 +234,21 @@ class MainActivity : AppCompatActivity() {
     private fun login() {
         val username = findViewById<EditText>(R.id.username_input).text.toString().trim()
         val password = findViewById<EditText>(R.id.password_input).text.toString()
+        val email = findViewById<EditText>(R.id.email_input).text.toString().trim()
+        val remember = findViewById<CheckBox>(R.id.remember_checkbox).isChecked
         val error = findViewById<TextView>(R.id.account_error)
         val preferences = getSharedPreferences("voegmaatje_account", MODE_PRIVATE)
         val savedUsername = preferences.getString("username", null)
         val savedPasswordHash = preferences.getString("password_hash", null)
+        val savedEmail = preferences.getString("email", null)
         if (savedUsername.isNullOrBlank() || savedPasswordHash.isNullOrBlank()) {
             error.text = "Maak eerst een account aan"
-        } else if (username != savedUsername || hashPassword(password) != savedPasswordHash) {
+        } else if (username != savedUsername || email != savedEmail || hashPassword(password) != savedPasswordHash) {
             error.text = "Gebruikersnaam of wachtwoord is niet juist"
         } else {
             error.text = ""
+            val rememberUntil = if (remember) System.currentTimeMillis() + 180L * 24L * 60L * 60L * 1000L else 0L
+            preferences.edit().putLong("remember_until", rememberUntil).apply()
             showMainForUser(savedUsername)
         }
     }
@@ -242,14 +265,38 @@ class MainActivity : AppCompatActivity() {
         showStartPage()
     }
 
+    private fun showAccountScreen() {
+        accountScreen.visibility = View.VISIBLE
+        forgotScreen.visibility = View.GONE
+        manualPanel.visibility = View.GONE
+        menuScreen.visibility = View.GONE
+        savedScreen.visibility = View.GONE
+    }
+
+    private fun showForgotPassword() {
+        accountScreen.visibility = View.GONE
+        forgotScreen.visibility = View.VISIBLE
+    }
+
+    private fun requestPasswordReset() {
+        val email = findViewById<EditText>(R.id.forgot_email_input).text.toString().trim()
+        val savedEmail = getSharedPreferences("voegmaatje_account", MODE_PRIVATE).getString("email", null)
+        val message = findViewById<TextView>(R.id.forgot_status)
+        message.text = if (Patterns.EMAIL_ADDRESS.matcher(email).matches() && email == savedEmail) {
+            "E-mailadres herkend. Een echte resetlink vereist nog een gekoppelde maildienst."
+        } else {
+            "Dit e-mailadres staat niet bij dit account."
+        }
+    }
+
     private fun logout() {
-        getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit().putBoolean("logged_in", false).apply()
+        getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit().putBoolean("logged_in", false).putLong("remember_until", 0L).apply()
         findViewById<EditText>(R.id.username_input).text.clear()
         findViewById<EditText>(R.id.password_input).text.clear()
         manualPanel.visibility = View.GONE
         menuScreen.visibility = View.GONE
         savedScreen.visibility = View.GONE
-        accountScreen.visibility = View.VISIBLE
+        showAccountScreen()
     }
 
     private fun readManualInput() {

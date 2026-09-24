@@ -357,6 +357,22 @@
             android:textColor="#173F3A"
             android:textColorHint="#847F73"
             android:backgroundTint="#D5CDBF" />
+        <EditText
+            android:id="@+id/email_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="E-mailadres"
+            android:inputType="textEmailAddress"
+            android:autofillHints="emailAddress"
+            android:textColor="#173F3A"
+            android:textColorHint="#847F73"
+            android:backgroundTint="#D5CDBF" />
+        <CheckBox
+            android:id="@+id/remember_checkbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ingelogd blijven (6 maanden)"
+            android:textColor="#173F3A" />
         <TextView
             android:id="@+id/account_error"
             android:layout_width="match_parent"
@@ -372,11 +388,68 @@
             android:textColor="#FFFDF8"
             android:text="Inloggen" />
         <Button
+            android:id="@+id/forgot_password_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#E8DFCF"
+            android:textColor="#173F3A"
+            android:text="Wachtwoord vergeten" />
+        <Button
             android:id="@+id/create_account_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="#C96F4A"
             android:textColor="#FFFDF8"
             android:text="Account maken" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/forgot_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="28dp"
+        android:background="#FFFDF8"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Wachtwoord vergeten"
+            android:textColor="#173F3A"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/forgot_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Vul je e-mailadres in om een resetlink aan te vragen."
+            android:textColor="#847F73"
+            android:textSize="14sp"
+            android:paddingTop="12dp"
+            android:paddingBottom="18dp" />
+        <EditText
+            android:id="@+id/forgot_email_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="E-mailadres"
+            android:inputType="textEmailAddress"
+            android:textColor="#173F3A"
+            android:textColorHint="#847F73"
+            android:backgroundTint="#D5CDBF" />
+        <Button
+            android:id="@+id/request_reset_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#C96F4A"
+            android:textColor="#FFFDF8"
+            android:text="Resetlink aanvragen" />
+        <Button
+            android:id="@+id/back_to_login_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#E8DFCF"
+            android:textColor="#173F3A"
+            android:text="Terug naar inloggen" />
     </LinearLayout>
 </FrameLayout>
