@@ -2,6 +2,7 @@ package nl.muurmaat.ar
 
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.sceneform.AnchorNode
@@ -37,15 +38,12 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.length_button).setOnClickListener { selectMode(MeasureMode.LENGTH) }
         findViewById<Button>(R.id.height_button).setOnClickListener { selectMode(MeasureMode.HEIGHT) }
         findViewById<Button>(R.id.reset_button).setOnClickListener { resetMeasurement() }
+        findViewById<Button>(R.id.manual_button).setOnClickListener { readManualInput() }
 
         arFragment.setOnTapArPlaneListener { hitResult, plane, _ -> onPlaneTap(hitResult, plane) }
     }
 
     private fun onPlaneTap(hitResult: HitResult, plane: Plane) {
-        if (plane.type != Plane.Type.VERTICAL) {
-            status.text = "Richt de camera op een muur en tik op het vlak"
-            return
-        }
         val point = Vector3(hitResult.hitPose.tx(), hitResult.hitPose.ty(), hitResult.hitPose.tz())
         addMarker(hitResult)
         if (firstPoint == null) {
@@ -59,7 +57,7 @@ class MainActivity : AppCompatActivity() {
             }
             if (mode == MeasureMode.LENGTH) length = distance else height = distance
             firstPoint = null
-            status.text = "${mode.label} gemeten. Kies de andere maat."
+            status.text = "${mode.label} gemeten. Kies de andere maat of gebruik Invoer."
             updateResult()
         }
     }
@@ -98,14 +96,29 @@ class MainActivity : AppCompatActivity() {
         firstPoint = null
         length = null
         height = null
-        status.text = "Kies lengte en tik een beginpunt aan"
+        status.text = "Scan een vlak of vul lengte en hoogte handmatig in"
+        updateResult()
+    }
+
+    private fun readManualInput() {
+        val lengthInput = findViewById<EditText>(R.id.manual_length).text.toString().replace(',', '.').toFloatOrNull()
+        val heightInput = findViewById<EditText>(R.id.manual_height).text.toString().replace(',', '.').toFloatOrNull()
+        if (lengthInput == null || heightInput == null || lengthInput <= 0f || heightInput <= 0f) {
+            status.text = "Vul lengte en hoogte groter dan 0 in"
+            return
+        }
+        length = lengthInput
+        height = heightInput
+        firstPoint = null
+        status.text = "Handmatige maten opgeslagen"
         updateResult()
     }
 
     private fun updateResult() {
         val lengthText = length?.let { "%.2f m".format(it) } ?: "-"
         val heightText = height?.let { "%.2f m".format(it) } ?: "-"
-        result.text = "Lengte: $lengthText   Hoogte: $heightText"
+        val bagsText = if (length != null && height != null) "%.0f".format(kotlin.math.ceil(length!! * height!! / 2.5f)) else "-"
+        result.text = "Lengte: $lengthText   Hoogte: $heightText   Zakken: $bagsText"
     }
 
     private enum class MeasureMode(val label: String) { LENGTH("Lengte"), HEIGHT("Hoogte") }

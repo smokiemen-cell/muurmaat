@@ -30,6 +30,35 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+            <EditText
+                android:id="@+id/manual_length"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Lengte m"
+                android:inputType="numberDecimal"
+                android:textColor="#FFFDF8"
+                android:textColorHint="#B1C0B6" />
+            <EditText
+                android:id="@+id/manual_height"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Hoogte m"
+                android:inputType="numberDecimal"
+                android:textColor="#FFFDF8"
+                android:textColorHint="#B1C0B6" />
+            <Button
+                android:id="@+id/manual_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Invoer" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
             <Button
                 android:id="@+id/length_button"
                 android:layout_width="0dp"
@@ -53,7 +82,7 @@
             android:id="@+id/result"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Lengte: -   Hoogte: -"
+            android:text="Lengte: -   Hoogte: -   Zakken: -"
             android:textColor="#FFFDF8"
             android:textSize="18sp"
             android:paddingTop="12dp" />
