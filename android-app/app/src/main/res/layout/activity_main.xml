@@ -148,6 +148,13 @@
                 android:text="Invoer" />
         </LinearLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gemiddelde prijs per zak"
+            android:textColor="#847F73"
+            android:textSize="12sp"
+            android:paddingTop="10dp" />
         <EditText
             android:id="@+id/manual_price"
             android:layout_width="match_parent"
