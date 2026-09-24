@@ -62,6 +62,11 @@ document.querySelector('#camera-button').addEventListener('click', async () => {
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: 'environment' } }, audio: false });
     cameraVideo.srcObject = cameraStream;
+    const cameraTrack = cameraStream.getVideoTracks()[0];
+    const capabilities = cameraTrack.getCapabilities?.();
+    if (capabilities?.zoom) {
+      await cameraTrack.applyConstraints({ advanced: [{ zoom: capabilities.zoom.min }] });
+    }
     setCameraStatus('1/3: tik het beginpunt en eindpunt van de referentie aan.');
   } catch (error) {
     const message = error.name === 'NotAllowedError'
