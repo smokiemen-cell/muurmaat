@@ -7,7 +7,8 @@
         android:id="@+id/ar_fragment"
         android:name="com.google.ar.sceneform.ux.ArFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/camera_hand"
@@ -52,6 +53,23 @@
         android:orientation="vertical"
         android:padding="20dp"
         android:background="#E6173F3A">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Voegmaatje"
+            android:textColor="#FFFDF8"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:paddingBottom="4dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Maten, aantallen en prijzen zijn indicaties en kunnen afwijken van de werkelijkheid."
+            android:textColor="#B1C0B6"
+            android:textSize="12sp"
+            android:paddingBottom="12dp" />
 
         <TextView
             android:id="@+id/status"
