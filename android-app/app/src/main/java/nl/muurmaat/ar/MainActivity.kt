@@ -371,19 +371,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun lookupAveragePrice() {
         status.text = "Gemiddelde internetprijs zoeken..."
+        findViewById<EditText>(R.id.manual_price).text.clear()
         functions.getHttpsCallable("getAverageGroutPrice").call()
             .addOnSuccessListener { result ->
                 val data = result.data as? Map<*, *>
                 val price = (data?.get("averagePrice") as? Number)?.toDouble()
+                val samples = (data?.get("samples") as? Number)?.toInt() ?: 0
                 if (price == null) {
                     status.text = "Geen gemiddelde prijs gevonden"
                 } else {
                     val formatted = String.format(Locale.US, "%.2f", price).replace('.', ',')
                     findViewById<EditText>(R.id.manual_price).setText(formatted)
-                    status.text = "Gemiddelde internetprijs ingevuld: € $formatted per zak"
+                    status.text = "Gemiddelde internetprijs: € $formatted op basis van $samples gevonden prijzen"
                 }
             }
-            .addOnFailureListener { status.text = "Internetprijs kon niet worden opgehaald" }
+            .addOnFailureListener { status.text = "Internetprijs kon niet worden opgehaald; vul zelf een prijs in" }
     }
 
     private fun showMainForUser(username: String) {
