@@ -8,6 +8,7 @@ import android.view.animation.TranslateAnimation
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.math.Vector3
@@ -23,8 +24,14 @@ import kotlin.math.sqrt
 
 class MainActivity : AppCompatActivity() {
     private lateinit var arFragment: ArFragment
+    private lateinit var arContainer: View
     private lateinit var status: TextView
     private lateinit var cameraScreen: View
+    private lateinit var manualPanel: View
+    private lateinit var menuScreen: View
+    private lateinit var savedScreen: View
+    private lateinit var savedMeasurements: TextView
+    private val savedPrefsName = "voegmaatje_measurements"
     private lateinit var result: TextView
     private var mode = MeasureMode.LENGTH
     private var firstPoint: Vector3? = null
@@ -36,29 +43,41 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        arFragment = supportFragmentManager.findFragmentById(R.id.ar_fragment) as ArFragment
+        arContainer = findViewById(R.id.ar_container)
+        manualPanel = findViewById(R.id.manual_panel)
+        menuScreen = findViewById(R.id.menu_screen)
+        savedScreen = findViewById(R.id.saved_screen)
+        arFragment = ArFragment()
+        supportFragmentManager.beginTransaction().add(R.id.ar_container, arFragment, "ar_fragment").commitNow()
+        arFragment.planeDiscoveryController?.hide()
         status = findViewById(R.id.status)
+        savedMeasurements = findViewById(R.id.saved_measurements)
+        updateSavedMeasurements()
         cameraScreen = findViewById(R.id.camera_screen)
         result = findViewById(R.id.result)
         val handHint = findViewById<TextView>(R.id.camera_hand)
-        val sceneView = arFragment.arSceneView
-        sceneView.visibility = View.GONE
+        arContainer.visibility = View.GONE
         status.text = "Vul je muur in of kies camera"
 
         findViewById<Button>(R.id.length_button).setOnClickListener { selectMode(MeasureMode.LENGTH) }
         findViewById<Button>(R.id.height_button).setOnClickListener { selectMode(MeasureMode.HEIGHT) }
         findViewById<Button>(R.id.reset_button).setOnClickListener { resetMeasurement() }
         findViewById<Button>(R.id.manual_button).setOnClickListener { readManualInput() }
+        findViewById<Button>(R.id.save_button).setOnClickListener { saveMeasurement() }
+        findViewById<Button>(R.id.menu_button).setOnClickListener { openMenu() }
+        findViewById<Button>(R.id.start_button).setOnClickListener { showStartPage() }
+        findViewById<Button>(R.id.saved_button).setOnClickListener { showSavedPage() }
+        findViewById<Button>(R.id.saved_back_button).setOnClickListener { showStartPage() }
         findViewById<Button>(R.id.average_price_button).setOnClickListener {
             findViewById<EditText>(R.id.manual_price).setText("8,50")
             status.text = "Gemiddelde richtprijs ingevuld: € 8,50 per zak"
         }
         findViewById<Button>(R.id.camera_button).setOnClickListener { button ->
-            sceneView.visibility = View.VISIBLE
+            arContainer.visibility = View.VISIBLE
             cameraScreen.visibility = View.VISIBLE
             findViewById<View>(R.id.manual_panel).visibility = View.GONE
             handHint.visibility = View.VISIBLE
-            status.text = "Camera actief: tik een beginpunt voor de lengte aan"
+            status.text = "Automatische meting: tik beginpunt en daarna eindpunt"
             handHint.startAnimation(handAnimation())
         }
         findViewById<Button>(R.id.close_camera_button).setOnClickListener { closeCameraScreen() }
@@ -120,17 +139,42 @@ class MainActivity : AppCompatActivity() {
         firstPoint = null
         length = null
         height = null
+        mode = MeasureMode.LENGTH
+        findViewById<EditText>(R.id.manual_length).text.clear()
+        findViewById<EditText>(R.id.manual_height).text.clear()
+        findViewById<EditText>(R.id.manual_price).setText("8,50")
+        findViewById<EditText>(R.id.wall_name).text.clear()
+        showStartPage()
         status.text = "Scan een vlak of vul lengte en hoogte handmatig in"
         updateResult()
     }
 
     private fun closeCameraScreen() {
-        arFragment.arSceneView.visibility = View.GONE
+        arContainer.visibility = View.GONE
         cameraScreen.visibility = View.GONE
-        findViewById<View>(R.id.manual_panel).visibility = View.VISIBLE
+        manualPanel.visibility = View.VISIBLE
         findViewById<View>(R.id.camera_hand).visibility = View.GONE
         findViewById<View>(R.id.camera_hand).clearAnimation()
         status.text = "Vul je muur in of kies camera"
+    }
+
+    private fun openMenu() {
+        manualPanel.visibility = View.GONE
+        menuScreen.visibility = View.VISIBLE
+        savedScreen.visibility = View.GONE
+    }
+
+    private fun showStartPage() {
+        manualPanel.visibility = View.VISIBLE
+        menuScreen.visibility = View.GONE
+        savedScreen.visibility = View.GONE
+    }
+
+    private fun showSavedPage() {
+        updateSavedMeasurements()
+        manualPanel.visibility = View.GONE
+        menuScreen.visibility = View.GONE
+        savedScreen.visibility = View.VISIBLE
     }
 
     private fun readManualInput() {
@@ -147,6 +191,36 @@ class MainActivity : AppCompatActivity() {
         updateResult()
     }
 
+    private fun saveMeasurement() {
+        val name = findViewById<EditText>(R.id.wall_name).text.toString().trim()
+        if (name.isBlank() || length == null || height == null) {
+            status.text = "Vul een naam en geldige maten in voordat je opslaat"
+            return
+        }
+        val price = findViewById<EditText>(R.id.manual_price).text.toString().replace(',', '.').toFloatOrNull() ?: 8.5f
+        val bags = kotlin.math.ceil(length!! * height!! / 2.5f).toInt()
+        val record = listOf(name.replace('|', '/'), "%.2f".format(length!!), "%.2f".format(height!!), bags, "%.2f".format(bags * price)).joinToString("|")
+        val preferences = getSharedPreferences(savedPrefsName, MODE_PRIVATE)
+        val records = preferences.getStringSet("records", emptySet()).orEmpty().toMutableSet()
+        records.add(record)
+        preferences.edit().putStringSet("records", records).apply()
+        findViewById<EditText>(R.id.wall_name).text.clear()
+        updateSavedMeasurements()
+        Toast.makeText(this, "Meting opgeslagen", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun updateSavedMeasurements() {
+        val records = getSharedPreferences(savedPrefsName, MODE_PRIVATE).getStringSet("records", emptySet()).orEmpty()
+        savedMeasurements.text = if (records.isEmpty()) {
+            "Nog geen metingen opgeslagen"
+        } else {
+            records.mapNotNull { record ->
+                val parts = record.split('|')
+                if (parts.size == 5) "${parts[0]} - ${parts[1]} x ${parts[2]} m | ${parts[3]} zakken | € ${parts[4]}" else null
+            }.sorted().joinToString("\n")
+        }
+    }
+
     private fun updateResult() {
         val lengthText = length?.let { "%.2f m".format(it) } ?: "-"
         val heightText = height?.let { "%.2f m".format(it) } ?: "-"
@@ -154,7 +228,7 @@ class MainActivity : AppCompatActivity() {
         val price = findViewById<EditText>(R.id.manual_price).text.toString().replace(',', '.').toFloatOrNull() ?: 8.5f
         val total = if (bagsText != "-") "€ %.2f".format(bagsText.toFloat() * price) else "-"
         val area = if (length != null && height != null) "%.2f m²".format(length!! * height!!) else "-"
-        result.text = "Oppervlakte: $area   Zakken: $bagsText   Totaal: $total"
+        result.text = "Oppervlakte: $area\nZakken: $bagsText\nPrijs per zak: € %.2f\nTotaalprijs: $total".format(price)
     }
 
     private fun handAnimation(): Animation = TranslateAnimation(0f, 0f, 0f, 28f).apply {
