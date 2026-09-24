@@ -7,16 +7,27 @@ admin.initializeApp();
 const serpApiKey = defineSecret('SERPAPI_KEY');
 
 exports.getAverageGroutPrice = onCall({ secrets: [serpApiKey] }, async () => {
-  const query = encodeURIComponent('voegmortel voegsel 25 kg prijs Nederland');
-  const response = await fetch(`https://serpapi.com/search.json?engine=google&q=${query}&hl=nl&gl=nl&api_key=${serpApiKey.value()}`);
-  if (!response.ok) throw new HttpsError('internal', 'Prijs zoeken is mislukt.');
+  const searchQuery = 'voegmortel 25 kg prijs';
+  const query = encodeURIComponent(searchQuery);
+  const response = await fetch(`https://serpapi.com/search.json?engine=google&q=${query}&location=Netherlands&hl=nl&gl=nl&num=20&api_key=${serpApiKey.value()}`);
+  const responseText = await response.text();
+  if (!response.ok) {
+    logger.error('SerpAPI error', { status: response.status, body: responseText.slice(0, 300) });
+    throw new HttpsError('internal', 'Prijs zoeken is mislukt.');
+  }
 
-  const data = await response.json();
+  const data = JSON.parse(responseText);
   const prices = [];
   const pricePattern = /(?:EUR|€)\s?([0-9]{1,3}(?:[.,][0-9]{1,2})?)/gi;
-  const products = (data.organic_results || []).filter((item) => {
+  const resultItems = [...(data.organic_results || []), ...(data.shopping_results || [])];
+  const products = resultItems.filter((item) => {
     const text = JSON.stringify(item).toLowerCase();
-    return /25\s*-?\s*kg|25kg/.test(text) && /voeg|mortel|voegsel/.test(text);
+    return /voeg|mortel|voegsel/.test(text);
+  });
+  logger.info('SerpAPI results', {
+    organicCount: resultItems.length,
+    returnedQuery: data.search_parameters?.q,
+    titles: resultItems.slice(0, 5).map((item) => item.title || item.name || '')
   });
   for (const product of products) {
     const text = JSON.stringify(product).replace(/\\u20ac/g, '€');
