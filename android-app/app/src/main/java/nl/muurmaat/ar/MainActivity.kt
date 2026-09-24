@@ -17,6 +17,7 @@ import java.security.MessageDigest
 import android.util.Patterns
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.functions.FirebaseFunctions
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.math.Vector3
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     private val savedPrefsName = "voegmaatje_measurements"
     private val firebaseAuth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
+    private val functions: FirebaseFunctions by lazy { FirebaseFunctions.getInstance() }
     private lateinit var result: TextView
     private var mode = MeasureMode.LENGTH
     private var firstPoint: Vector3? = null
@@ -416,13 +418,9 @@ class MainActivity : AppCompatActivity() {
             message.text = "Vul een geldig e-mailadres in."
             return
         }
-        firestore.collection("usernames").whereEqualTo("email", email).limit(1).get()
-            .addOnSuccessListener { result ->
-                message.text = if (result.isEmpty) "Geen gebruikersnaam gevonden voor dit e-mailadres." else "Gebruikersnaam gevonden: ${result.documents.first().getString("username")}"
-            }
-            .addOnFailureListener {
-                message.text = "Gebruikersnaam kon niet worden opgehaald."
-            }
+        functions.getHttpsCallable("requestUsernameEmail").call(mapOf("email" to email))
+            .addOnSuccessListener { message.text = "Een e-mail met je gebruikersnaam is verzonden." }
+            .addOnFailureListener { message.text = "De gebruikersnaam-e-mail kon niet worden verzonden." }
     }
 
     private fun logout() {
