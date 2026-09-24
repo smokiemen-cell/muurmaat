@@ -23,8 +23,8 @@ Set-Location (Join-Path $projectRoot 'functions')
 Invoke-Checked $npm @('install')
 
 Set-Location $projectRoot
-Write-Host "Plak RESEND_API_KEY alleen in deze terminal."
-Invoke-Checked $firebase @('functions:secrets:set', 'RESEND_API_KEY', '--project', 'voegmaatje')
+Write-Host "Plak SERPAPI_KEY alleen in deze terminal."
+Invoke-Checked $firebase @('functions:secrets:set', 'SERPAPI_KEY', '--project', 'voegmaatje')
 
 Invoke-Checked $firebase @('deploy', '--only', 'functions', '--project', 'voegmaatje')
 Write-Host "Klaar: Firebase Functions zijn gedeployed."

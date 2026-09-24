@@ -17,6 +17,8 @@ import java.security.MessageDigest
 import android.util.Patterns
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.functions.FirebaseFunctions
+import java.util.Locale
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.math.Vector3
@@ -47,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     private val savedPrefsName = "voegmaatje_measurements"
     private val firebaseAuth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
+    private val functions: FirebaseFunctions by lazy { FirebaseFunctions.getInstance() }
     private lateinit var result: TextView
     private var mode = MeasureMode.LENGTH
     private var firstPoint: Vector3? = null
@@ -98,8 +101,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<CheckBox>(R.id.show_account_password).setOnCheckedChangeListener { _, checked -> togglePassword(R.id.password_input, checked) }
         findViewById<CheckBox>(R.id.show_change_password).setOnCheckedChangeListener { _, checked -> togglePassword(R.id.change_password_input, checked) }
         findViewById<Button>(R.id.average_price_button).setOnClickListener {
-            findViewById<EditText>(R.id.manual_price).setText("21,95")
-            status.text = "Richtprijs ingevuld: € 21,95 per zak"
+            lookupAveragePrice()
         }
         findViewById<Button>(R.id.camera_button).setOnClickListener { button ->
             openArCamera()
@@ -365,6 +367,23 @@ class MainActivity : AppCompatActivity() {
     private fun hashPassword(password: String): String {
         val digest = MessageDigest.getInstance("SHA-256").digest(password.toByteArray())
         return digest.joinToString("") { byte -> "%02x".format(byte) }
+    }
+
+    private fun lookupAveragePrice() {
+        status.text = "Gemiddelde internetprijs zoeken..."
+        functions.getHttpsCallable("getAverageGroutPrice").call()
+            .addOnSuccessListener { result ->
+                val data = result.data as? Map<*, *>
+                val price = (data?.get("averagePrice") as? Number)?.toDouble()
+                if (price == null) {
+                    status.text = "Geen gemiddelde prijs gevonden"
+                } else {
+                    val formatted = String.format(Locale.US, "%.2f", price).replace('.', ',')
+                    findViewById<EditText>(R.id.manual_price).setText(formatted)
+                    status.text = "Gemiddelde internetprijs ingevuld: € $formatted per zak"
+                }
+            }
+            .addOnFailureListener { status.text = "Internetprijs kon niet worden opgehaald" }
     }
 
     private fun showMainForUser(username: String) {
