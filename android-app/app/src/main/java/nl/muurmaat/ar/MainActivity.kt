@@ -250,6 +250,10 @@ class MainActivity : AppCompatActivity() {
         val email = getSharedPreferences("voegmaatje_account", MODE_PRIVATE).getString("email", "").orEmpty()
         val remember = findViewById<CheckBox>(R.id.remember_checkbox).isChecked
         val error = findViewById<TextView>(R.id.account_error)
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            error.text = "Dit account heeft geen geldig e-mailadres. Maak het account opnieuw aan."
+            return
+        }
         val savedUsername = getSharedPreferences("voegmaatje_account", MODE_PRIVATE).getString("username", username) ?: username
         firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (!task.isSuccessful) {
