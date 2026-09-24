@@ -91,6 +91,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.login_button).setOnClickListener { login() }
         findViewById<Button>(R.id.forgot_password_button).setOnClickListener { showForgotPassword() }
         findViewById<Button>(R.id.request_reset_button).setOnClickListener { requestPasswordReset() }
+        findViewById<Button>(R.id.request_username_button).setOnClickListener { requestUsername() }
         findViewById<Button>(R.id.back_to_login_button).setOnClickListener { showAccountScreen() }
         findViewById<Button>(R.id.logout_button).setOnClickListener { logout() }
         findViewById<Button>(R.id.account_details_button).setOnClickListener { showAccountDetails() }
@@ -304,7 +305,7 @@ class MainActivity : AppCompatActivity() {
             firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                     firebaseAuth.currentUser?.sendEmailVerification()
-                    firestore.collection("usernames").document(username.lowercase()).set(mapOf("username" to username, "uid" to firebaseAuth.currentUser?.uid))
+                    firestore.collection("usernames").document(username.lowercase()).set(mapOf("username" to username, "email" to email, "uid" to firebaseAuth.currentUser?.uid))
                     getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit()
                         .putString("username", username)
                         .putString("email", email)
@@ -411,6 +412,22 @@ class MainActivity : AppCompatActivity() {
                 message.text = if (task.isSuccessful) "Resetlink verzonden. Controleer je e-mail." else "Resetlink kon niet worden verzonden."
             }
         }
+    }
+
+    private fun requestUsername() {
+        val email = findViewById<EditText>(R.id.forgot_email_input).text.toString().trim()
+        val message = findViewById<TextView>(R.id.forgot_status)
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            message.text = "Vul een geldig e-mailadres in."
+            return
+        }
+        firestore.collection("usernames").whereEqualTo("email", email).limit(1).get()
+            .addOnSuccessListener { result ->
+                message.text = if (result.isEmpty) "Geen gebruikersnaam gevonden voor dit e-mailadres." else "Gebruikersnaam gevonden: ${result.documents.first().getString("username")}"
+            }
+            .addOnFailureListener {
+                message.text = "Gebruikersnaam kon niet worden opgehaald."
+            }
     }
 
     private fun logout() {
