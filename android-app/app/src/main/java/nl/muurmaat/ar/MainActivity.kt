@@ -17,7 +17,6 @@ import java.security.MessageDigest
 import android.util.Patterns
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.functions.FirebaseFunctions
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.math.Vector3
@@ -48,7 +47,6 @@ class MainActivity : AppCompatActivity() {
     private val savedPrefsName = "voegmaatje_measurements"
     private val firebaseAuth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
-    private val functions: FirebaseFunctions by lazy { FirebaseFunctions.getInstance() }
     private lateinit var result: TextView
     private var mode = MeasureMode.LENGTH
     private var firstPoint: Vector3? = null
@@ -93,7 +91,6 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.login_button).setOnClickListener { login() }
         findViewById<Button>(R.id.forgot_password_button).setOnClickListener { showForgotPassword() }
         findViewById<Button>(R.id.request_reset_button).setOnClickListener { requestPasswordReset() }
-        findViewById<Button>(R.id.request_username_button).setOnClickListener { requestUsername() }
         findViewById<Button>(R.id.back_to_login_button).setOnClickListener { showAccountScreen() }
         findViewById<Button>(R.id.account_details_back).setOnClickListener { showStartPage() }
         findViewById<Button>(R.id.update_account_button).setOnClickListener { updateAccountDetails() }
@@ -411,17 +408,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun requestUsername() {
-        val email = findViewById<EditText>(R.id.forgot_email_input).text.toString().trim()
-        val message = findViewById<TextView>(R.id.forgot_status)
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            message.text = "Vul een geldig e-mailadres in."
-            return
-        }
-        functions.getHttpsCallable("requestUsernameEmail").call(mapOf("email" to email))
-            .addOnSuccessListener { message.text = "Een e-mail met je gebruikersnaam is verzonden." }
-            .addOnFailureListener { message.text = "De gebruikersnaam-e-mail kon niet worden verzonden." }
-    }
 
     private fun logout() {
         getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit().putBoolean("logged_in", false).putLong("remember_until", 0L).apply()

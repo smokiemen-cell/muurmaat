@@ -462,13 +462,6 @@
             android:textColor="#FFFDF8"
             android:text="Resetlink aanvragen" />
         <Button
-            android:id="@+id/request_username_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#E8DFCF"
-            android:textColor="#173F3A"
-            android:text="Gebruikersnaam vergeten" />
-        <Button
             android:id="@+id/back_to_login_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
