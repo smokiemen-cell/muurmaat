@@ -9,6 +9,41 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <TextView
+        android:id="@+id/camera_hand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="☝"
+        android:textSize="52sp"
+        android:visibility="gone"
+        android:alpha="0.9" />
+
+    <FrameLayout
+        android:id="@+id/camera_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/close_camera_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_margin="16dp"
+            android:text="Sluiten" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="20dp"
+            android:text="CAMERA METEN"
+            android:textColor="#FFFDF8"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+    </FrameLayout>
+
     <LinearLayout
         android:id="@+id/manual_panel"
         android:layout_width="match_parent"

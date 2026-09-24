@@ -2,6 +2,9 @@ package nl.muurmaat.ar
 
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.Animation
+import android.view.animation.TranslateAnimation
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -21,6 +24,7 @@ import kotlin.math.sqrt
 class MainActivity : AppCompatActivity() {
     private lateinit var arFragment: ArFragment
     private lateinit var status: TextView
+    private lateinit var cameraScreen: View
     private lateinit var result: TextView
     private var mode = MeasureMode.LENGTH
     private var firstPoint: Vector3? = null
@@ -34,7 +38,9 @@ class MainActivity : AppCompatActivity() {
 
         arFragment = supportFragmentManager.findFragmentById(R.id.ar_fragment) as ArFragment
         status = findViewById(R.id.status)
+        cameraScreen = findViewById(R.id.camera_screen)
         result = findViewById(R.id.result)
+        val handHint = findViewById<TextView>(R.id.camera_hand)
         val sceneView = arFragment.arSceneView
         sceneView.visibility = View.GONE
         status.text = "Vul je muur in of kies camera"
@@ -47,10 +53,15 @@ class MainActivity : AppCompatActivity() {
             findViewById<EditText>(R.id.manual_price).setText("8,50")
             status.text = "Gemiddelde richtprijs ingevuld: € 8,50 per zak"
         }
-        findViewById<Button>(R.id.camera_button).setOnClickListener {
+        findViewById<Button>(R.id.camera_button).setOnClickListener { button ->
             sceneView.visibility = View.VISIBLE
+            cameraScreen.visibility = View.VISIBLE
+            findViewById<View>(R.id.manual_panel).visibility = View.GONE
+            handHint.visibility = View.VISIBLE
             status.text = "Camera actief: tik een beginpunt voor de lengte aan"
+            handHint.startAnimation(handAnimation())
         }
+        findViewById<Button>(R.id.close_camera_button).setOnClickListener { closeCameraScreen() }
 
         arFragment.setOnTapArPlaneListener { hitResult, plane, _ -> onPlaneTap(hitResult, plane) }
     }
@@ -105,13 +116,21 @@ class MainActivity : AppCompatActivity() {
             arFragment.arSceneView.scene.removeChild(marker)
         }
         markerNodes.clear()
-        arFragment.arSceneView.visibility = View.GONE
-        findViewById<View>(R.id.manual_panel).visibility = View.VISIBLE
+        closeCameraScreen()
         firstPoint = null
         length = null
         height = null
         status.text = "Scan een vlak of vul lengte en hoogte handmatig in"
         updateResult()
+    }
+
+    private fun closeCameraScreen() {
+        arFragment.arSceneView.visibility = View.GONE
+        cameraScreen.visibility = View.GONE
+        findViewById<View>(R.id.manual_panel).visibility = View.VISIBLE
+        findViewById<View>(R.id.camera_hand).visibility = View.GONE
+        findViewById<View>(R.id.camera_hand).clearAnimation()
+        status.text = "Vul je muur in of kies camera"
     }
 
     private fun readManualInput() {
@@ -136,6 +155,13 @@ class MainActivity : AppCompatActivity() {
         val total = if (bagsText != "-") "€ %.2f".format(bagsText.toFloat() * price) else "-"
         val area = if (length != null && height != null) "%.2f m²".format(length!! * height!!) else "-"
         result.text = "Oppervlakte: $area   Zakken: $bagsText   Totaal: $total"
+    }
+
+    private fun handAnimation(): Animation = TranslateAnimation(0f, 0f, 0f, 28f).apply {
+        duration = 700
+        repeatMode = Animation.REVERSE
+        repeatCount = Animation.INFINITE
+        interpolator = AccelerateDecelerateInterpolator()
     }
 
     private enum class MeasureMode(val label: String) { LENGTH("Lengte"), HEIGHT("Hoogte") }
