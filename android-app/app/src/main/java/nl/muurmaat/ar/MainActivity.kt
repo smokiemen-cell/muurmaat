@@ -115,13 +115,7 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.close_camera_button).setOnClickListener { closeCameraScreen() }
 
-        val accountPreferences = getSharedPreferences("voegmaatje_account", MODE_PRIVATE)
-        val rememberUntil = accountPreferences.getLong("remember_until", 0L)
-        if (firebaseAuth.currentUser?.isEmailVerified == true && accountPreferences.getBoolean("logged_in", false) && rememberUntil > System.currentTimeMillis()) {
-            showMainForUser(accountPreferences.getString("username", "") ?: "")
-        } else {
-            showAccountScreen()
-        }
+        showStartPage()
 
     }
 
