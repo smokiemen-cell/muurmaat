@@ -47,8 +47,8 @@ const resetCameraMeasurement = () => {
   cameraPoints = [];
   cameraMode = 'reference';
   cameraPointsLayer.innerHTML = '';
-  cameraStep.textContent = 'Tik referentie aan';
-  setCameraStatus('Tik de twee uiteinden van de referentie aan.');
+  cameraStep.textContent = '1/3 Referentie';
+  setCameraStatus('1/3: tik het beginpunt en eindpunt van de referentie aan.');
 };
 
 document.querySelector('#camera-button').addEventListener('click', async () => {
@@ -62,7 +62,7 @@ document.querySelector('#camera-button').addEventListener('click', async () => {
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: 'environment' } }, audio: false });
     cameraVideo.srcObject = cameraStream;
-    setCameraStatus('Tik de twee uiteinden van de referentie aan.');
+    setCameraStatus('1/3: tik het beginpunt en eindpunt van de referentie aan.');
   } catch (error) {
     const message = error.name === 'NotAllowedError'
       ? 'Cameratoegang is geweigerd. Geef toestemming in je browserinstellingen.'
@@ -91,13 +91,13 @@ cameraVideo.addEventListener('pointerup', (event) => {
   marker.style.top = `${(point.y / bounds.height) * 100}%`;
   cameraPointsLayer.append(marker);
   if (cameraPoints.length === 2 && cameraMode === 'reference') {
-    cameraMode = 'height';
-    cameraStep.textContent = 'Tik muurhoogte aan';
-    setCameraStatus('Goed. Tik nu de twee uiteinden van de muurhoogte aan.');
-  } else if (cameraPoints.length === 4 && cameraMode === 'height') {
     cameraMode = 'length';
-    cameraStep.textContent = 'Tik muurlengte aan';
-    setCameraStatus('Bijna klaar. Tik de twee uiteinden van de muurlengte aan.');
+    cameraStep.textContent = '2/3 Muurlengte';
+    setCameraStatus('2/3: tik het beginpunt en eindpunt van de muurlengte aan.');
+  } else if (cameraPoints.length === 4 && cameraMode === 'length') {
+    cameraMode = 'height';
+    cameraStep.textContent = '3/3 Muurhoogte';
+    setCameraStatus('3/3: tik het beginpunt en eindpunt van de muurhoogte aan.');
   } else if (cameraPoints.length === 6) {
     const distance = (first, second) => Math.hypot(second.x - first.x, second.y - first.y);
     const reference = Number(document.querySelector('#reference-length').value);
@@ -107,8 +107,8 @@ cameraVideo.addEventListener('pointerup', (event) => {
       return;
     }
     const scale = reference / referencePixels;
-    const height = distance(cameraPoints[2], cameraPoints[3]) * scale;
-    const length = distance(cameraPoints[4], cameraPoints[5]) * scale;
+    const length = distance(cameraPoints[2], cameraPoints[3]) * scale;
+    const height = distance(cameraPoints[4], cameraPoints[5]) * scale;
     document.querySelector('#height').value = height.toFixed(2);
     document.querySelector('#length').value = length.toFixed(2);
     document.querySelector('#wall-form').requestSubmit();
