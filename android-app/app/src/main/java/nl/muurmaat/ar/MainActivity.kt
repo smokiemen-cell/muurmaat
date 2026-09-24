@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private var firstPoint: Vector3? = null
     private var length: Float? = null
     private var height: Float? = null
+    private val markerNodes = mutableListOf<AnchorNode>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +67,7 @@ class MainActivity : AppCompatActivity() {
     private fun addMarker(hitResult: HitResult) {
         val anchorNode = AnchorNode(hitResult.createAnchor())
         anchorNode.setParent(arFragment.arSceneView.scene)
+        markerNodes += anchorNode
         TransformableNode(arFragment.transformationSystem).also {
             it.setParent(anchorNode)
             MaterialFactory.makeOpaqueWithColor(this, Color(android.graphics.Color.rgb(201, 111, 74))).thenAccept { material ->
@@ -88,7 +90,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun resetMeasurement() {
-        arFragment.arSceneView.scene.removeChild(arFragment.arSceneView.scene.children.firstOrNull())
+        markerNodes.forEach { marker ->
+            marker.anchor?.detach()
+            arFragment.arSceneView.scene.removeChild(marker)
+        }
+        markerNodes.clear()
         firstPoint = null
         length = null
         height = null
