@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import java.security.MessageDigest
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.math.Vector3
@@ -74,6 +75,8 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.saved_button).setOnClickListener { showSavedPage() }
         findViewById<Button>(R.id.saved_back_button).setOnClickListener { showStartPage() }
         findViewById<Button>(R.id.create_account_button).setOnClickListener { createAccount() }
+        findViewById<Button>(R.id.login_button).setOnClickListener { login() }
+        findViewById<Button>(R.id.logout_button).setOnClickListener { logout() }
         findViewById<Button>(R.id.average_price_button).setOnClickListener {
             findViewById<EditText>(R.id.manual_price).setText("21,95")
             status.text = "Richtprijs ingevuld: € 21,95 per zak"
@@ -88,13 +91,8 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.close_camera_button).setOnClickListener { closeCameraScreen() }
 
-        val savedUsername = getSharedPreferences("voegmaatje_account", MODE_PRIVATE).getString("username", null)
-        if (savedUsername.isNullOrBlank()) {
-            manualPanel.visibility = View.GONE
-            accountScreen.visibility = View.VISIBLE
-        } else {
-            showMainForUser(savedUsername)
-        }
+        manualPanel.visibility = View.GONE
+        accountScreen.visibility = View.VISIBLE
 
         arFragment.setOnTapArPlaneListener { hitResult, plane, _ -> onPlaneTap(hitResult, plane) }
     }
@@ -193,15 +191,65 @@ class MainActivity : AppCompatActivity() {
 
     private fun createAccount() {
         val username = findViewById<EditText>(R.id.username_input).text.toString().trim()
-        if (username.isBlank()) return
-        getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit().putString("username", username).apply()
+        val password = findViewById<EditText>(R.id.password_input).text.toString()
+        val error = findViewById<TextView>(R.id.account_error)
+        val preferences = getSharedPreferences("voegmaatje_account", MODE_PRIVATE)
+        if (!preferences.getString("username", null).isNullOrBlank()) {
+            error.text = "Dit account bestaat al. Gebruik Inloggen."
+            return
+        }
+        if (username.length < 2) {
+            error.text = "Gebruikersnaam moet minimaal 2 tekens hebben"
+            return
+        }
+        if (password.length < 4) {
+            error.text = "Wachtwoord moet minimaal 4 tekens hebben"
+            return
+        }
+        preferences.edit()
+            .putString("username", username)
+            .putString("password_hash", hashPassword(password))
+            .apply()
         showMainForUser(username)
+    }
+
+    private fun login() {
+        val username = findViewById<EditText>(R.id.username_input).text.toString().trim()
+        val password = findViewById<EditText>(R.id.password_input).text.toString()
+        val error = findViewById<TextView>(R.id.account_error)
+        val preferences = getSharedPreferences("voegmaatje_account", MODE_PRIVATE)
+        val savedUsername = preferences.getString("username", null)
+        val savedPasswordHash = preferences.getString("password_hash", null)
+        if (savedUsername.isNullOrBlank() || savedPasswordHash.isNullOrBlank()) {
+            error.text = "Maak eerst een account aan"
+        } else if (username != savedUsername || hashPassword(password) != savedPasswordHash) {
+            error.text = "Gebruikersnaam of wachtwoord is niet juist"
+        } else {
+            error.text = ""
+            showMainForUser(savedUsername)
+        }
+    }
+
+    private fun hashPassword(password: String): String {
+        val digest = MessageDigest.getInstance("SHA-256").digest(password.toByteArray())
+        return digest.joinToString("") { byte -> "%02x".format(byte) }
     }
 
     private fun showMainForUser(username: String) {
         welcomeText.text = "Welkom, $username"
+        getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit().putBoolean("logged_in", true).apply()
         accountScreen.visibility = View.GONE
         showStartPage()
+    }
+
+    private fun logout() {
+        getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit().putBoolean("logged_in", false).apply()
+        findViewById<EditText>(R.id.username_input).text.clear()
+        findViewById<EditText>(R.id.password_input).text.clear()
+        manualPanel.visibility = View.GONE
+        menuScreen.visibility = View.GONE
+        savedScreen.visibility = View.GONE
+        accountScreen.visibility = View.VISIBLE
     }
 
     private fun readManualInput() {
