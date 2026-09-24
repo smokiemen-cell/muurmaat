@@ -1,4 +1,4 @@
-const CACHE_NAME = 'muurmaat-v2';
+const CACHE_NAME = 'muurmaat-v3';
 const APP_FILES = ['./', './index.html', './styles.css', './app.js', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', (event) => {
