@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#173f3a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <title>Muurmaat | Voegcalculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="intro-panel">
+      <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+      <p class="eyebrow">Bouwcalculator</p>
+      <h1>Muurmaat</h1>
+      <p class="intro-copy">Meet je muur. Plan je voegwerk. Weet wat je nodig hebt.</p>
+      <div class="intro-note">
+        <span class="note-icon" aria-hidden="true">i</span>
+        <p>Een zak voegmortel dekt <strong>2,5 m²</strong>. Rond altijd iets naar boven af voor snijverlies.</p>
+      </div>
+    </section>
+
+    <section class="calculator-panel" aria-label="Muurmaat calculator">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Nieuwe meting</p>
+          <h2>Vul je maten in</h2>
+        </div>
+        <span class="step-count">01 / 01</span>
+      </div>
+
+      <form id="wall-form">
+        <button class="camera-button" id="camera-button" type="button"><span class="camera-icon" aria-hidden="true">◉</span><span>Meet met camera</span><span class="arrow" aria-hidden="true">↗</span></button>
+        <fieldset>
+          <legend>Oppervlakte van de muur</legend>
+          <div class="input-grid">
+            <label class="field">
+              <span>Hoogte</span>
+              <div class="input-wrap"><input id="height" name="height" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0,00" required><span>m</span></div>
+            </label>
+            <label class="field">
+              <span>Lengte</span>
+              <div class="input-wrap"><input id="length" name="length" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0,00" required><span>m</span></div>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Voegafmetingen</legend>
+          <div class="input-grid">
+            <label class="field">
+              <span>Breedte voeg</span>
+              <div class="input-wrap"><input id="joint-width" name="joint-width" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0" required><span>mm</span></div>
+            </label>
+            <label class="field">
+              <span>Diepte voeg</span>
+              <div class="input-wrap"><input id="joint-depth" name="joint-depth" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0" required><span>mm</span></div>
+            </label>
+          </div>
+        </fieldset>
+
+        <button class="calculate-button" type="submit"><span>Bereken materiaal</span><span class="arrow" aria-hidden="true">↗</span></button>
+      </form>
+
+      <div class="results" id="results" aria-live="polite">
+        <div class="results-topline"><span>Jouw resultaat</span><span class="status-dot"></span></div>
+        <div class="main-result">
+          <div><span class="result-label">Benodigde zakken</span><strong id="bag-count">—</strong><span class="result-subtext">zakken voegmortel</span></div>
+          <div class="bag-icon" aria-hidden="true"><span>2,5</span><small>m²</small></div>
+        </div>
+        <div class="result-details">
+          <div><span>Oppervlakte muur</span><strong id="area-result">—</strong></div>
+          <div><span>Voegbreedte</span><strong id="width-result">—</strong></div>
+          <div><span>Voegdiepte</span><strong id="depth-result">—</strong></div>
+        </div>
+        <p class="result-hint" id="result-hint">Vul de maten in en je resultaat verschijnt hier.</p>
+      </div>
+    </section>
+  </main>
+  <section class="camera-modal" id="camera-modal" aria-hidden="true" aria-label="Camera meetmodus">
+    <div class="camera-card">
+      <div class="camera-heading"><div><p class="eyebrow">Camera meetmodus</p><h2>Scan je muur</h2></div><button class="close-button" id="close-camera" type="button" aria-label="Sluit camera">×</button></div>
+      <div class="camera-view"><video id="camera-video" autoplay playsinline muted></video><div class="camera-crosshair" aria-hidden="true"></div><span class="camera-live">LIVE</span></div>
+      <p class="camera-instruction">Vul eerst de lengte van een zichtbare referentie in. Tik daarna de twee uiteinden van de referentie, vervolgens de twee uiteinden van de muur aan.</p>
+      <label class="field reference-field"><span>Referentielengte</span><div class="input-wrap"><input id="reference-length" type="number" min="0.01" step="0.01" value="1" inputmode="decimal"><span>m</span></div></label>
+      <div class="camera-actions"><button class="secondary-button" id="reset-camera" type="button">Opnieuw</button><button class="calculate-button" id="camera-measure" type="button"><span id="camera-step">Tik referentie aan</span><span class="arrow" aria-hidden="true">↗</span></button></div>
+      <p class="camera-status" id="camera-status">Camera wordt gestart...</p>
+    </div>
+  </section>
+  <footer>MAATWERK VOOR JE MUUR <span>•</span> SNEL &amp; HELDER</footer>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+  </script>
+</body>
+</html>
