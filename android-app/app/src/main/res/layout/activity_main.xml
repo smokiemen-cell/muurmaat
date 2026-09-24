@@ -313,6 +313,40 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/login_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="28dp"
+        android:background="#FFFDF8">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Voegmaatje"
+            android:textColor="#173F3A"
+            android:textSize="34sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Inloggen"
+            android:textColor="#847F73"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:paddingTop="12dp"
+            android:paddingBottom="22dp" />
+        <EditText android:id="@+id/login_username_input" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Gebruikersnaam" android:inputType="textCapSentences" android:textColor="#173F3A" android:textColorHint="#847F73" android:backgroundTint="#D5CDBF" />
+        <EditText android:id="@+id/login_password_input" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Wachtwoord" android:inputType="textPassword" android:autofillHints="password" android:textColor="#173F3A" android:textColorHint="#847F73" android:backgroundTint="#D5CDBF" />
+        <CheckBox android:id="@+id/remember_checkbox" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Ingelogd blijven (6 maanden)" android:textColor="#173F3A" />
+        <TextView android:id="@+id/account_error" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#C96F4A" android:textSize="12sp" android:paddingTop="8dp" />
+        <Button android:id="@+id/login_button" android:layout_width="match_parent" android:layout_height="wrap_content" android:backgroundTint="#173F3A" android:textColor="#FFFDF8" android:text="Inloggen" />
+        <Button android:id="@+id/forgot_password_button" android:layout_width="match_parent" android:layout_height="wrap_content" android:backgroundTint="#E8DFCF" android:textColor="#173F3A" android:text="Wachtwoord vergeten" />
+        <Button android:id="@+id/open_create_account_button" android:layout_width="match_parent" android:layout_height="wrap_content" android:backgroundTint="#C96F4A" android:textColor="#FFFDF8" android:text="Account maken" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/account_screen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -331,7 +365,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Log in of maak eerst je account aan om verder te gaan."
+            android:text="Maak je account aan"
             android:textColor="#847F73"
             android:textSize="14sp"
             android:gravity="center"
@@ -367,12 +401,6 @@
             android:textColor="#173F3A"
             android:textColorHint="#847F73"
             android:backgroundTint="#D5CDBF" />
-        <CheckBox
-            android:id="@+id/remember_checkbox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ingelogd blijven (6 maanden)"
-            android:textColor="#173F3A" />
         <TextView
             android:id="@+id/account_error"
             android:layout_width="match_parent"
@@ -381,26 +409,13 @@
             android:textSize="12sp"
             android:paddingTop="8dp" />
         <Button
-            android:id="@+id/login_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#173F3A"
-            android:textColor="#FFFDF8"
-            android:text="Inloggen" />
-        <Button
-            android:id="@+id/forgot_password_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#E8DFCF"
-            android:textColor="#173F3A"
-            android:text="Wachtwoord vergeten" />
-        <Button
             android:id="@+id/create_account_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="#C96F4A"
             android:textColor="#FFFDF8"
             android:text="Account maken" />
+        <Button android:id="@+id/back_to_login_from_create_button" android:layout_width="match_parent" android:layout_height="wrap_content" android:backgroundTint="#E8DFCF" android:textColor="#173F3A" android:text="Terug naar inloggen" />
     </LinearLayout>
 
     <LinearLayout
