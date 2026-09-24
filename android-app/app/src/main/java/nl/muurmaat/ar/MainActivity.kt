@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var menuScreen: View
     private lateinit var savedScreen: View
     private lateinit var accountScreen: View
+    private lateinit var loginScreen: View
     private lateinit var forgotScreen: View
     private lateinit var welcomeText: TextView
     private lateinit var savedMeasurements: LinearLayout
@@ -57,10 +58,8 @@ class MainActivity : AppCompatActivity() {
         menuScreen = findViewById(R.id.menu_screen)
         savedScreen = findViewById(R.id.saved_screen)
         accountScreen = findViewById(R.id.account_screen)
+        loginScreen = findViewById(R.id.login_screen)
         forgotScreen = findViewById(R.id.forgot_screen)
-        arFragment = ArFragment()
-        supportFragmentManager.beginTransaction().add(R.id.ar_container, arFragment, "ar_fragment").commitNow()
-        arFragment.planeDiscoveryController?.hide()
         status = findViewById(R.id.status)
         welcomeText = findViewById(R.id.welcome_text)
         savedMeasurements = findViewById(R.id.saved_measurements)
@@ -81,6 +80,8 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.saved_button).setOnClickListener { showSavedPage() }
         findViewById<Button>(R.id.saved_back_button).setOnClickListener { showStartPage() }
         findViewById<Button>(R.id.create_account_button).setOnClickListener { createAccount() }
+        findViewById<Button>(R.id.open_create_account_button).setOnClickListener { showCreateAccount() }
+        findViewById<Button>(R.id.back_to_login_from_create_button).setOnClickListener { showAccountScreen() }
         findViewById<Button>(R.id.login_button).setOnClickListener { login() }
         findViewById<Button>(R.id.forgot_password_button).setOnClickListener { showForgotPassword() }
         findViewById<Button>(R.id.request_reset_button).setOnClickListener { requestPasswordReset() }
@@ -91,6 +92,7 @@ class MainActivity : AppCompatActivity() {
             status.text = "Richtprijs ingevuld: € 21,95 per zak"
         }
         findViewById<Button>(R.id.camera_button).setOnClickListener { button ->
+            openArCamera()
             arContainer.visibility = View.VISIBLE
             cameraScreen.visibility = View.VISIBLE
             findViewById<View>(R.id.manual_panel).visibility = View.GONE
@@ -108,7 +110,15 @@ class MainActivity : AppCompatActivity() {
             showAccountScreen()
         }
 
-        arFragment.setOnTapArPlaneListener { hitResult, plane, _ -> onPlaneTap(hitResult, plane) }
+    }
+
+    private fun openArCamera() {
+        if (!::arFragment.isInitialized) {
+            arFragment = ArFragment()
+            supportFragmentManager.beginTransaction().add(R.id.ar_container, arFragment, "ar_fragment").commitNow()
+            arFragment.planeDiscoveryController?.hide()
+            arFragment.setOnTapArPlaneListener { hitResult, plane, _ -> onPlaneTap(hitResult, plane) }
+        }
     }
 
     private fun onPlaneTap(hitResult: HitResult, plane: Plane) {
@@ -235,9 +245,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun login() {
-        val username = findViewById<EditText>(R.id.username_input).text.toString().trim()
-        val password = findViewById<EditText>(R.id.password_input).text.toString()
-        val email = findViewById<EditText>(R.id.email_input).text.toString().trim()
+        val username = findViewById<EditText>(R.id.login_username_input).text.toString().trim()
+        val password = findViewById<EditText>(R.id.login_password_input).text.toString()
+        val email = getSharedPreferences("voegmaatje_account", MODE_PRIVATE).getString("email", "").orEmpty()
         val remember = findViewById<CheckBox>(R.id.remember_checkbox).isChecked
         val error = findViewById<TextView>(R.id.account_error)
         val savedUsername = getSharedPreferences("voegmaatje_account", MODE_PRIVATE).getString("username", username) ?: username
@@ -264,19 +274,28 @@ class MainActivity : AppCompatActivity() {
     private fun showMainForUser(username: String) {
         welcomeText.text = "Welkom, $username"
         getSharedPreferences("voegmaatje_account", MODE_PRIVATE).edit().putBoolean("logged_in", true).apply()
+        loginScreen.visibility = View.GONE
         accountScreen.visibility = View.GONE
         showStartPage()
     }
 
     private fun showAccountScreen() {
-        accountScreen.visibility = View.VISIBLE
+        loginScreen.visibility = View.VISIBLE
+        accountScreen.visibility = View.GONE
         forgotScreen.visibility = View.GONE
         manualPanel.visibility = View.GONE
         menuScreen.visibility = View.GONE
         savedScreen.visibility = View.GONE
     }
 
+    private fun showCreateAccount() {
+        loginScreen.visibility = View.GONE
+        accountScreen.visibility = View.VISIBLE
+        forgotScreen.visibility = View.GONE
+    }
+
     private fun showForgotPassword() {
+        loginScreen.visibility = View.GONE
         accountScreen.visibility = View.GONE
         forgotScreen.visibility = View.VISIBLE
     }
@@ -298,6 +317,8 @@ class MainActivity : AppCompatActivity() {
         firebaseAuth.signOut()
         findViewById<EditText>(R.id.username_input).text.clear()
         findViewById<EditText>(R.id.password_input).text.clear()
+        findViewById<EditText>(R.id.login_username_input).text.clear()
+        findViewById<EditText>(R.id.login_password_input).text.clear()
         manualPanel.visibility = View.GONE
         menuScreen.visibility = View.GONE
         savedScreen.visibility = View.GONE
