@@ -181,6 +181,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+            <EditText android:id="@+id/manual_joint_width" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:hint="Voegbreedte mm" android:inputType="numberDecimal" android:text="15" android:textColor="#173F3A" android:textColorHint="#847F73" android:backgroundTint="#D5CDBF" />
+            <EditText android:id="@+id/manual_joint_depth" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:hint="Voegdiepte mm" android:inputType="numberDecimal" android:text="10" android:textColor="#173F3A" android:textColorHint="#847F73" android:backgroundTint="#D5CDBF" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
             <Button
                 android:id="@+id/camera_button"
                 android:layout_width="0dp"

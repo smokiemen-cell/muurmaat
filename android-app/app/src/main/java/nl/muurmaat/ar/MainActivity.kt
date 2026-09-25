@@ -229,6 +229,8 @@ class MainActivity : AppCompatActivity() {
         findViewById<EditText>(R.id.manual_length).text.clear()
         findViewById<EditText>(R.id.manual_height).text.clear()
         findViewById<EditText>(R.id.manual_price).setText("21,95")
+        findViewById<EditText>(R.id.manual_joint_width).setText("15")
+        findViewById<EditText>(R.id.manual_joint_depth).setText("10")
         findViewById<EditText>(R.id.wall_name).text.clear()
         showStartPage()
         status.text = "Scan een vlak of vul lengte en hoogte handmatig in"
@@ -515,7 +517,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val price = findViewById<EditText>(R.id.manual_price).text.toString().replace(',', '.').toFloatOrNull() ?: 21.95f
-        val bags = kotlin.math.ceil(length!! * height!! / 2.5f).toInt()
+        val bags = calculateBags().toInt()
         val record = listOf(name.replace('|', '/'), "%.2f".format(length!!), "%.2f".format(height!!), bags, "%.2f".format(bags * price)).joinToString("|")
         val preferences = getSharedPreferences(savedPrefsName, MODE_PRIVATE)
         val records = preferences.getStringSet("records", emptySet()).orEmpty().toMutableSet()
@@ -565,11 +567,18 @@ class MainActivity : AppCompatActivity() {
     private fun updateResult() {
         val lengthText = length?.let { "%.2f m".format(it) } ?: "-"
         val heightText = height?.let { "%.2f m".format(it) } ?: "-"
-        val bagsText = if (length != null && height != null) "%.0f".format(kotlin.math.ceil(length!! * height!! / 2.5f)) else "-"
+        val bagsText = if (length != null && height != null) "%.0f".format(calculateBags()) else "-"
         val price = findViewById<EditText>(R.id.manual_price).text.toString().replace(',', '.').toFloatOrNull() ?: 8.5f
         val total = if (bagsText != "-") "€ %.2f".format(bagsText.toFloat() * price) else "-"
         val area = if (length != null && height != null) "%.2f m²".format(length!! * height!!) else "-"
         result.text = "Oppervlakte: $area\nZakken: $bagsText\nPrijs per zak: € %.2f\nTotaalprijs: $total".format(price)
+    }
+
+    private fun calculateBags(): Double {
+        val width = findViewById<EditText>(R.id.manual_joint_width).text.toString().replace(',', '.').toDoubleOrNull() ?: 15.0
+        val depth = findViewById<EditText>(R.id.manual_joint_depth).text.toString().replace(',', '.').toDoubleOrNull() ?: 10.0
+        val sizeFactor = (width / 15.0) * (depth / 10.0)
+        return kotlin.math.ceil((length!! * height!! / 2.5f) * sizeFactor)
     }
 
     private fun writeMeasuredFields() {
