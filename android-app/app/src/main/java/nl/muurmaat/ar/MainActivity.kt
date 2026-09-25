@@ -160,6 +160,7 @@ class MainActivity : AppCompatActivity() {
             if (wall != null && wall.extentX > 0.1f && wall.extentZ > 0.1f) {
                 length = wall.extentX
                 height = wall.extentZ
+                writeMeasuredFields()
                 updateResult()
                 val lengthText = "%.2f".format(length!!)
                 val heightText = "%.2f".format(height!!)
@@ -182,6 +183,7 @@ class MainActivity : AppCompatActivity() {
                 return
             }
             if (mode == MeasureMode.LENGTH) length = distance else height = distance
+            writeMeasuredFields()
             firstPoint = null
             status.text = "${mode.label} gemeten. Kies de andere maat of gebruik Invoer."
             updateResult()
@@ -568,6 +570,11 @@ class MainActivity : AppCompatActivity() {
         val total = if (bagsText != "-") "€ %.2f".format(bagsText.toFloat() * price) else "-"
         val area = if (length != null && height != null) "%.2f m²".format(length!! * height!!) else "-"
         result.text = "Oppervlakte: $area\nZakken: $bagsText\nPrijs per zak: € %.2f\nTotaalprijs: $total".format(price)
+    }
+
+    private fun writeMeasuredFields() {
+        length?.let { findViewById<EditText>(R.id.manual_length).setText("%.2f".format(it)) }
+        height?.let { findViewById<EditText>(R.id.manual_height).setText("%.2f".format(it)) }
     }
 
     private fun handAnimation(): Animation = TranslateAnimation(0f, 0f, 0f, 28f).apply {
