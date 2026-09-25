@@ -29,6 +29,7 @@ import com.google.ar.sceneform.rendering.MaterialFactory
 import com.google.ar.sceneform.rendering.ShapeFactory
 import com.google.ar.core.HitResult
 import com.google.ar.core.Plane
+import com.google.ar.core.TrackingState
 import com.google.ar.core.Pose
 import kotlin.math.sqrt
 
@@ -37,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var arContainer: View
     private lateinit var status: TextView
     private lateinit var cameraScreen: View
+    private lateinit var cameraStatusText: TextView
     private lateinit var manualPanel: View
     private lateinit var menuScreen: View
     private lateinit var savedScreen: View
@@ -56,6 +58,7 @@ class MainActivity : AppCompatActivity() {
     private var length: Float? = null
     private var height: Float? = null
     private val markerNodes = mutableListOf<AnchorNode>()
+    private var automaticScanAttached = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,6 +83,7 @@ class MainActivity : AppCompatActivity() {
         savedMeasurements = findViewById(R.id.saved_measurements)
         updateSavedMeasurements()
         cameraScreen = findViewById(R.id.camera_screen)
+        cameraStatusText = findViewById(R.id.camera_status)
         result = findViewById(R.id.result)
         val handHint = findViewById<TextView>(R.id.camera_hand)
         arContainer.visibility = View.GONE
@@ -115,8 +119,10 @@ class MainActivity : AppCompatActivity() {
             cameraScreen.visibility = View.VISIBLE
             findViewById<View>(R.id.manual_panel).visibility = View.GONE
             handHint.visibility = View.VISIBLE
-            status.text = "Automatische meting: tik beginpunt en daarna eindpunt"
+            status.text = "Automatische meting: richt de camera op de muur"
+            cameraStatusText.text = "Richt de camera op een muur"
             handHint.startAnimation(handAnimation())
+            attachAutomaticWallScan()
         }
         findViewById<Button>(R.id.close_camera_button).setOnClickListener { closeCameraScreen() }
 
@@ -130,6 +136,27 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.beginTransaction().add(R.id.ar_container, arFragment, "ar_fragment").commitNow()
             arFragment.planeDiscoveryController?.hide()
             arFragment.setOnTapArPlaneListener { hitResult, plane, _ -> onPlaneTap(hitResult, plane) }
+        }
+    }
+
+    private fun attachAutomaticWallScan() {
+        if (automaticScanAttached) return
+        automaticScanAttached = true
+        arFragment.arSceneView.scene.addOnUpdateListener {
+            val wall = arFragment.arSceneView.arFrame
+                ?.getUpdatedTrackables(Plane::class.java)
+                ?.firstOrNull { plane ->
+                    plane.type == Plane.Type.VERTICAL && plane.trackingState == TrackingState.TRACKING
+                }
+            if (wall != null && wall.extentX > 0.1f && wall.extentZ > 0.1f) {
+                length = wall.extentX
+                height = wall.extentZ
+                updateResult()
+                val lengthText = "%.2f".format(length!!)
+                val heightText = "%.2f".format(height!!)
+                cameraStatusText.text = "Muur automatisch gemeten: ${lengthText} m x ${heightText} m"
+                status.text = "Muur automatisch gemeten. Sluit camera of controleer resultaat."
+            }
         }
     }
 
