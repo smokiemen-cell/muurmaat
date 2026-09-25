@@ -59,6 +59,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val defaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            ErrorLog.write(this, "Onverwerkte crash in ${thread.name}", throwable)
+            defaultExceptionHandler?.uncaughtException(thread, throwable)
+        }
+        ErrorLog.write(this, "App gestart")
         setContentView(R.layout.activity_main)
 
         arContainer = findViewById(R.id.ar_container)
@@ -309,6 +315,7 @@ class MainActivity : AppCompatActivity() {
                     error.text = "Account gemaakt. Controleer je e-mail en log daarna in."
                 } else {
                     val message = task.exception?.message.orEmpty()
+                    ErrorLog.write(this, "Account maken mislukt", task.exception)
                     error.text = if (message.contains("already", ignoreCase = true)) "Dit e-mailadres bestaat al. Gebruik Inloggen." else task.exception?.localizedMessage ?: "Account maken is mislukt"
                 }
             }
@@ -351,9 +358,11 @@ class MainActivity : AppCompatActivity() {
         val savedUsername = getSharedPreferences("voegmaatje_account", MODE_PRIVATE).getString("username", username) ?: username
         firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (!task.isSuccessful) {
+                ErrorLog.write(this, "Inloggen mislukt", task.exception)
                 error.text = task.exception?.localizedMessage ?: "Inloggen is mislukt"
             } else if (firebaseAuth.currentUser?.isEmailVerified != true) {
                 firebaseAuth.signOut()
+                ErrorLog.write(this, "Inloggen geblokkeerd: e-mail niet bevestigd")
                 error.text = "Bevestig eerst je e-mailadres via de ontvangen e-mail"
             } else {
                 error.text = ""
@@ -385,7 +394,10 @@ class MainActivity : AppCompatActivity() {
                     status.text = "Gemiddelde internetprijs: € $formatted op basis van $samples gevonden prijzen"
                 }
             }
-            .addOnFailureListener { status.text = "Internetprijs kon niet worden opgehaald; vul zelf een prijs in" }
+            .addOnFailureListener { error ->
+                ErrorLog.write(this, "Internetprijs ophalen mislukt", error)
+                status.text = "Internetprijs kon niet worden opgehaald; vul zelf een prijs in"
+            }
     }
 
     private fun showMainForUser(username: String) {
@@ -424,6 +436,7 @@ class MainActivity : AppCompatActivity() {
             message.text = "Vul een geldig e-mailadres in."
         } else {
             firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+                if (!task.isSuccessful) ErrorLog.write(this, "Wachtwoordreset mislukt", task.exception)
                 message.text = if (task.isSuccessful) "Resetlink verzonden. Controleer je e-mail." else "Resetlink kon niet worden verzonden."
             }
         }
