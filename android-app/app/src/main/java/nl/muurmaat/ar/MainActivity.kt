@@ -142,12 +142,21 @@ class MainActivity : AppCompatActivity() {
     private fun attachAutomaticWallScan() {
         if (automaticScanAttached) return
         automaticScanAttached = true
+        cameraStatusText.text = "Beweeg langzaam langs de hele muur"
         arFragment.arSceneView.scene.addOnUpdateListener {
-            val wall = arFragment.arSceneView.arFrame
+            val updatedWalls = arFragment.arSceneView.arFrame
                 ?.getUpdatedTrackables(Plane::class.java)
-                ?.firstOrNull { plane ->
+                ?.filter { plane ->
                     plane.type == Plane.Type.VERTICAL && plane.trackingState == TrackingState.TRACKING
                 }
+                .orEmpty()
+            val knownWalls = arFragment.arSceneView.session
+                ?.getAllTrackables(Plane::class.java)
+                ?.filter { plane ->
+                    plane.type == Plane.Type.VERTICAL && plane.trackingState == TrackingState.TRACKING
+                }
+                .orEmpty()
+            val wall = (updatedWalls + knownWalls).maxByOrNull { plane -> plane.extentX * plane.extentZ }
             if (wall != null && wall.extentX > 0.1f && wall.extentZ > 0.1f) {
                 length = wall.extentX
                 height = wall.extentZ
